@@ -1,0 +1,89 @@
+"""API v3 changes category
+
+"""
+
+from tmdbapi._core import Tmdb
+
+
+_CHANGES_V3 = {
+    "changes-movie-list": {
+        "method": "get",
+        "params": [
+            {"in": "query", "name": "end_date"},
+            {"in": "query", "name": "page"},
+            {"in": "query", "name": "start_date"},
+        ],
+        "url": "/movie/changes",
+    },
+    "changes-people-list": {
+        "method": "get",
+        "params": [
+            {"in": "query", "name": "end_date"},
+            {"in": "query", "name": "page"},
+            {"in": "query", "name": "start_date"},
+        ],
+        "url": "/person/changes",
+    },
+    "changes-tv-list": {
+        "method": "get",
+        "params": [
+            {"in": "query", "name": "end_date"},
+            {"in": "query", "name": "page"},
+            {"in": "query", "name": "start_date"},
+        ],
+        "url": "/tv/changes",
+    },
+}
+
+
+class _Changes(Tmdb):
+
+    def __init__(self, info_var):
+        super().__init__()
+        self.base_path = ""
+        self.info_var = info_var
+
+    def request(self) -> dict:
+        url = self.build_url(3)
+        return self.request_raw(
+            url = url,
+        )
+
+    def change_list(self, use_name, start_date="", end_date="",
+                    page=1) -> dict:
+        """Wrap the same process for get th change list
+        """
+        self.reset()
+        self.use(use_name)
+        if start_date != "":
+            self.load_query(start_date=start_date)
+        if end_date != "":
+            self.load_query(end_date=end_date)
+        self.load_query(page=page)
+        return self.request()
+
+_changes = _Changes(_CHANGES_V3)
+
+
+def movie_list(start_date="", end_date="", page=1) -> dict:
+    """Get a list of all of the movie ids
+    that have been changed in the past 24
+    hours.
+    """
+    return _changes.change_list("changes-movie-list",
+                                start_date=start_date,
+                                end_date=end_date, page=page)
+
+
+def tv_list(start_date="", end_date="", page=1) -> dict:
+
+    return _changes.change_list("changes-tv-list",
+                                start_date=start_date,
+                                end_date=end_date, page=page)
+
+
+def person_list(start_date="", end_date="", page=1) -> dict:
+
+    return _changes.change_list("changes-people-list",
+                                start_date=start_date,
+                                end_date=end_date, page=page)
