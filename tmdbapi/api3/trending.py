@@ -3,6 +3,7 @@
 """
 
 from tmdbapi._core import Tmdb
+from tmdbapi.exceptions import type_checking
 
 
 _TRENDING_V3 = {
@@ -68,23 +69,29 @@ _trending = _Trending(_TRENDING_V3)
 
 def all(time_window="day", language: str = None) -> dict:
     """Get the trending movies, TV shows and people.
+    
+    time_window: 'day' or 'week'
     """
+    type_checking("time_window", time_window)
     return _trending.get("trending-all", time_window, language)
 
 
 def movies(time_window="day", language: str = None) -> dict:
     """Get the trending movies on TMDB.
     """
+    type_checking("time_window", time_window)
     return _trending.get("trending-movies", time_window, language)
 
 
 def people(time_window="day", language: str = None) -> dict:
     """Get the trending people on TMDB.
     """
+    type_checking("time_window", time_window)
     return _trending.get("trending-people", time_window, language)
 
 
 def tv(time_window="day", language: str = None) -> dict:
     """Get the trending TV shows on TMDB.
     """
+    type_checking("time_window", time_window)
     return _trending.get("trending-tv", time_window, language)

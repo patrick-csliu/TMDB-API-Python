@@ -3,6 +3,7 @@
 """
 
 from tmdbapi._core import Tmdb
+from tmdbapi.exceptions import type_checking
 
 
 _PEOPLE_V3 = {
@@ -125,7 +126,12 @@ def details(person_id: int, append_to_response="videos,images",
 def changes(person_id: int, start_date="", end_date="",
             page=1) -> dict:
     """Get the recent changes for a person.
+    
+    `start_date` and `start_date` is lte and gte
+    Format: YYYY-MM-DD
     """
+    type_checking("date", start_date)
+    type_checking("date", end_date)
     _people.reset()
     _people.use("person-changes")
     _people.load_path_arg(person_id=person_id)

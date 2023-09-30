@@ -3,6 +3,7 @@
 """
 
 from tmdbapi._core import Tmdb
+from tmdbapi.exceptions import type_checking
 
 
 _TV_EPISODES_V3 = {
@@ -189,8 +190,12 @@ def external_ids(series_id: int, season_number: int,
 
 
 def images(series_id: int, season_number: int, episode_number: int,
-            language: str = None, include_image_language: str = None) -> dict:
+           language: str = None, include_image_language: str = None) -> dict:
     """Get the images that belong to a TV episode.
+
+    include_image_language:
+    specify a comma separated list of ISO-639-1 values to query, 
+    for example: en,null
     """
     _tv_episodes.reset()
     _tv_episodes.use("tv-episode-images")
@@ -218,6 +223,9 @@ def translations(series_id: int, season_number: int,
 def videos(series_id: int, season_number: int, episode_number: int,
             language: str = None, include_video_language: str = None) -> dict:
     """Get the videos that belong to a TV episode.
+
+    include_video_language:
+    filter the list results by language, supports more than one value by using a comma
     """
     _tv_episodes.reset()
     _tv_episodes.use("tv-episode-videos")
@@ -233,7 +241,10 @@ def videos(series_id: int, season_number: int, episode_number: int,
 def add_rating(series_id: int, season_number: int, episode_number: int, rating,
                guest_session_id: str = None) -> dict:
     """Rate a TV episode and save it to your rated list.
+    
+    rating: 0~10
     """
+    type_checking("rating", rating)
     _tv_episodes.reset()
     _tv_episodes.use("tv-episode-add-rating")
     _tv_episodes.load_path_arg(series_id=series_id,

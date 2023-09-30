@@ -1,10 +1,10 @@
 """
-The core of the tmdb request api
+The Core of the TMDb Request API
 """
 
 import requests
 
-from .credential import CREDENTIALS
+import tmdbapi.credential
 from .exceptions import TmdbApiException
 from typing import TypedDict, Optional
 
@@ -34,13 +34,58 @@ SETTINGS: SettingsType = {
 }
 
 class Tmdb:
+    """The Tmdb class provides a Python interface for making requests to the TMDb (The Movie Database) API.
 
+    Attributes:
+        _headers (dict): Default headers for API requests.
+
+        session (requests.Session): A session for making HTTP requests.
+
+        base_path (str): The base path for each API category.
+
+        info_var (dict): The information dictionary for each API category. This dictionary contains HTTP request 
+            method, path, and parameters for each service.
+
+    Methods:
+        __init__(self): Initialize a new instance of the Tmdb class.
+
+        _authentication(self, headers: dict, params: dict) -> tuple[dict, dict]: Set the headers and query parameters
+            based on the 'use_access_token' setting.
+
+        check_token(self) -> dict: Check if the application is using an access_token or api_key and return the
+            appropriate query parameters.
+
+        choose_session_id(self, guest_session_id: str): Choose a session_id based on the provided `guest_session_id`
+            or use the default `session_id`.
+
+        use(self, name: str): Select a service from the information dictionary.
+
+        load_query(self, query={}, **kwargs): Update the query parameters for the API request.
+
+        load_path_arg(self, args={}, **kwargs): Update the path parameters in the relative URL.
+
+        load_json(self, json_dict: dict): Provide a JSON payload for the API request.
+
+        build_url(self, version: int) -> str: Build the URL for the API request.
+
+        sortby(self, asc: bool): Update the query parameters with valid values for sorting.
+
+        language(self, lang: str = None): Update the language parameter in the query.
+
+        region(self, region: str = None): Update the region parameter in the query.
+        
+        reset(self): Clear all content in class variables.
+
+        check_params(self, params: dict) -> bool: Check if the given parameters keys are all valid.
+
+        request_raw(self, url: str, method: str = None, params: dict = None, data=None, json: dict = None) -> dict: Send
+            the API request and handle the response.
+
+    """
     _headers = {"accept": "application/json",}
     session = requests.Session()
-    base_path = ""  # The base path for each api category
-    info_var: dict = None # The information dictionary for each api category
-                    # Information dictionary contains http request 
-                    # method, path and parameters for each service. 
+    base_path = ""
+    info_var: dict = None
 
     def __init__(self):
         self._ref: str = None    # (Relative) path for service
@@ -77,49 +122,50 @@ class Tmdb:
     #     return self.cached_request.cache_clear()
     
     def _authentication(self, headers: dict, params: dict) -> tuple[dict, dict]:
-        """Set the headers and query(params) by 'use_access_token' setting
+        """Set the headers and query parameters based on the 'use_access_token' setting.
 
         Parameters
         ----------
         headers : dict
+            The headers dictionary.
         params : dict
+            The headers dictionary. 
 
         Returns
         -------
         tuple[dict, dict]
             (headers, query)
+            A tuple containing the updated headers and query parameters.
         """
         if SETTINGS["use_access_token"]:
-            token = CREDENTIALS["access_token"]
+            token = tmdbapi.credential.CREDENTIALS["access_token"]
             headers["Authorization"] = f"Bearer {token}"
         else:
-            params["api_key"] = CREDENTIALS["api_key"]
+            params["api_key"] = tmdbapi.credential.CREDENTIALS["api_key"]
         return headers, params
 
     def check_token(self) -> dict:
-        """Check now is using access_token or api_key
+        """Check if the application is currently using an access_token or api_key.
 
-        If access_token used, no needed for session_id.
+        If an access_token is used, there is no need for session_id.
 
         Returns
         -------
         dict
-            A dict for query.
+            A dictionary with query parameters.
         """
         if SETTINGS["use_access_token"]:
             return {}
         else:
-            return {"session_id": CREDENTIALS["session_id"]}
+            return {"session_id": tmdbapi.credential.CREDENTIALS["session_id"]}
 
     def choose_session_id(self, guest_session_id: str):
-        """Choose a session_id
-
-        If `guest_session_id` is provided use `guest_session_id`;
-        otherwise, use `session_id`.
+        """Choose a session_id based on the provided 'guest_session_id' or use the default 'session_id'.
 
         Parameters
         ----------
         guest_session_id : str
+            The guest session ID.
         """
         if guest_session_id is None:
             self._query.update(self.check_token())
@@ -127,33 +173,34 @@ class Tmdb:
             self._query.update(guest_session_id=guest_session_id)
 
     def use(self, name: str):
-        """Select a service from information dict
+        """Select a service from the information dictionary.
 
         Parameters
         ----------
         name : str
-            key in the dict
+            The key in the information dictionary.
         """
         self._ref = self.info_var[name]["url"]
         self._method = self.info_var[name]["method"]
         self._name = name
 
     def load_query(self, query={}, **kwargs):
-        """Update the query parameters
+        """Update the query parameters.
 
         Parameters
         ----------
         query : dict, optional
+            The query parameters dictionary.
         """
         self._query.update(query)
         self._query.update(kwargs)
 
     def load_path_arg(self, args={}, **kwargs):
-        """Update the parameters in the _rel
+        """Update the parameters in the relative URL (_rel).
 
-        Example: The account.details have the rel = "/{account_id}/favorite"
+        Example: The account.details have the relative URL = "/{account_id}/favorite"
         And therefor it has one parameter `account_id`.
-        This is assign by load_path_arg(account_id=xxx).
+        This parameter can be assigned using `load_path_arg(account_id=xxx)`.
 
         Parameters
         ----------
@@ -163,38 +210,39 @@ class Tmdb:
         self._path_args.update(kwargs)
 
     def load_json(self, json_dict: dict):
-        """Give the dict format payload
+        """Provide a JSON payload for the request.
 
         Parameters
         ----------
         json_dict : dict
+            The JSON payload dictionary.
         """
         self._json = json_dict
 
     def build_url(self, version: int) -> str:
-        """Build the url for request
+        """Build the url for request.
 
         Parameters
         ----------
         version : int
-            3 or 4
+            The API version (3 or 4).
 
         Returns
         -------
         str
-            the url without query
+            The URL without query parameters.
         """
         self._ref = self._ref.format(**self._path_args)
         return f"{API_BASE}/{version}{self.base_path}{self._ref}"
 
     def sortby(self, asc: bool):
-        """Update query by the api sort_by valid values
+        """Update the query by specifying ascending or descending sorting order.
 
         Parameters
         ----------
         asc : bool
-            True : ascending
-            False: descending
+            True: Sort in ascending order.
+            False: Sort in descending order.
         """
         if asc:
             s =  {"sort_by": "created_at.asc"}
@@ -203,16 +251,16 @@ class Tmdb:
         self._query.update(s)
     
     def language(self, lang: str = None):
-        """Update the language parameter to query
+        """Update the language parameter in the query.
 
-        Use default language setting except the lang given.
+        If 'lang' is provided, it will be used; otherwise, the default language setting will be used.
 
         Parameters
         ----------
         lang : str, optional
-            format: `language-COUNTRY`
-            example: 'zh-TW', 'en-US'
-            see: https://developer.themoviedb.org/docs/languages
+            Format: `language-COUNTRY`.
+            Example: 'zh-TW', 'en-US'.
+            See: https://developer.themoviedb.org/docs/languages
         """
         if lang is not None:
             s = {"language": lang}
@@ -223,12 +271,12 @@ class Tmdb:
         self._query.update(s)
 
     def region(self, region: str = None):
-        """Update the region parameter to query
+        """Update the region parameter in the query.
 
         Parameters
         ----------
         region : str, optional
-            format: ISO 3166-1
+            Format: ISO 3166-1
         """
         if region is not None:
             s = {"region": region}
@@ -239,7 +287,7 @@ class Tmdb:
         self._query.update(s)
 
     def reset(self):
-        """Clean all content in variables
+        """Reset all content in instance variables.
         """
         self._ref = None
         self._method = None
@@ -255,12 +303,12 @@ class Tmdb:
         Parameters
         ----------
         params : dict
-            The dictionary from function input
+            The dictionary containing function input parameters.
 
         Returns
         -------
         bool
-            Return True if pass the check, otherwise return false.
+            Return True if pass the check; otherwise, return False.
         """
         params_name = []
         for p in self.info_var[self._name]["params"]:
@@ -268,31 +316,33 @@ class Tmdb:
         return set(params.keys()).issubset(set(params_name))
 
     def request_raw(self, url: str, method: str = None, params: dict = None, data=None, json: dict = None) -> dict:
-        """Send the request and handle the return
+        """Send a request and handle the response.
 
         Parameters
         ----------
         url : str
-            url without query
+            The URL without query parameters.
         method : str, optional
-            request method, by default None
+            The request method, default is None.
         params : dict, optional
-            query for url, by default None
+            The query parameters, default is None.
         data : _type_, optional
-            The payload, by default None
+            The payload data, default is None.
         json : dict, optional
-            The payload, by default None
+            The JSON payload, default is None.
 
         Returns
         -------
         dict
-            json format
+             A JSON-formatted response.
 
         Raises
         ------
         TmdbApiException
-            If the action not success
+            If the action is not successful.
         """
+        # set method, query(params), headers, json payload
+        #
         if method is None:
             method = self._method.upper()
         else:
@@ -306,9 +356,12 @@ class Tmdb:
         if json is not None:
             headers["content-type"] = "application/json"
         
+        # debug print #
         print("json:", json)
         print(method, headers)
-        # request from api
+
+        # send request to tmdb api
+        #
         if SETTINGS["use_session"]:
             request = self.session
         else:
@@ -324,9 +377,10 @@ class Tmdb:
                                     params=params, headers=headers,
                                     timeout=SETTINGS["timeout"])
 
+        # debug print #
         print(response.url)
+        # handle response
         headers = response.headers
-
         header_status_code = response.status_code
         has_content = headers.get("content-length", "1") != "0"
         if has_content:
@@ -349,13 +403,13 @@ class Tmdb:
 
 
 def use_access_token(use: bool):
-    """Use access_token or not
+    """Specify whether to use an access_token or not.
 
     Parameters
     ----------
     use : bool
-        True: Use the access_token
-        False: Use the api_key
+        True: Use the access_token.
+        False: Use the api_key.
     """
     if use and credential_check(("access_token")):
         SETTINGS["use_access_token"] = True
@@ -364,7 +418,7 @@ def use_access_token(use: bool):
 
 
 def credential_check(needed: str) -> bool:
-    """Check the needed credential exist
+    """Check if the needed credentials exist.
 
     Parameters
     ----------
@@ -375,12 +429,12 @@ def credential_check(needed: str) -> bool:
     Returns
     -------
     bool
-        Return True if the needed credential exist
+        Return True if the needed credential exist.
 
     Raises
     ------
     ExceptionGroup
-        If the needed credential is not exist
+        If the needed credentials do not exist.
     """
     token_type = (
         "access_token",
@@ -388,7 +442,7 @@ def credential_check(needed: str) -> bool:
         "session_id",
         "account_object_id"
     )
-    token_exist = [CREDENTIALS[token] is not None for token in token_type]
+    token_exist = [tmdbapi.credential.CREDENTIALS[token] is not None for token in token_type]
     exceptions = [
         Exception("You must set up an access token before making this request. Please configure your access token settings to proceed."),
         Exception("You must set up an api_key before making this request. Please configure your api_key settings to proceed."),
@@ -421,10 +475,10 @@ def settings(**kwargs):
     Raises
     ------
     ValueError
-        If the setting not in the Settings options
+        If the setting not in the Settings options.
     """
     if not set(kwargs.keys()).issubset(SETTINGS.keys()):
-        raise ValueError("The setting you given if not the options")
+        raise KeyError("The setting you given if not the options")
     if "use_session" in kwargs.keys() and kwargs["use_session"] != SETTINGS["use_session"]:
         if kwargs["use_session"]:
             Tmdb.session = requests.Session()

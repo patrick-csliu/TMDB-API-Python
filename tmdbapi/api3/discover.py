@@ -117,7 +117,7 @@ def movies(params: dict = None, **kwargs) -> dict:
     else:
         params.update(kwargs)
     if not _discover.check_params(params):
-        raise Exception("params error")
+        raise KeyError("The keyword in params is invalid")
     _discover.load_query(params)
     _discover.language(params.get("language", None))
     _discover.region(params.get("region", None))

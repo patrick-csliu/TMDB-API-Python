@@ -3,6 +3,7 @@
 """
 
 from tmdbapi._core import Tmdb, use_access_token
+from tmdbapi.exceptions import type_checking
 
 _LISTS_V4 = {
     "list-add-items": {
@@ -98,12 +99,11 @@ def add_items(list_id: int, items: list) -> dict:
     Parameters
     ----------
     list_id : int
-        The list id.
+        The ID of the list.
     items : list
-        Support three types of list.
-        There might be no comments for items; therefore, for tuples 
-        and lists, the length could be 2, and for dictionaries, the 
-        'comment' key might not be present. 
+        A list of items to add. It supports three types of list items:
+        Some items may not have comments. For tuples and lists, their length 
+        can be 2, while for dictionaries, the 'comment' key may be absent.
 
         1.
         ```
@@ -140,7 +140,7 @@ def add_items(list_id: int, items: list) -> dict:
     Returns
     -------
     dict
-        return from api
+        The response from the API.
     """
     _lists.reset()
     _lists.use("list-add-items")
@@ -194,6 +194,7 @@ def create(name: str, description="", public=False,
     dict
         return from api
     """
+    type_checking("list_sort_by", sort_by)
     _lists.reset()
     _lists.use("list-create")
     payload = {
@@ -225,6 +226,7 @@ def item_status(list_id: int, media_id: int,
                 media_type: str) -> dict:
     """Check if an item is on a list.
     """
+    type_checking("media_type", media_type)
     _lists.reset()
     _lists.use("list-item-status")
     _lists.load_path_arg(list_id=list_id)
@@ -233,7 +235,7 @@ def item_status(list_id: int, media_id: int,
 
 
 def remove_items(list_id: int, items: list) -> dict:
-    """Remove items from a list
+    """Remove items from a list.
 
     Parameters
     ----------
@@ -322,6 +324,7 @@ def update(list_id: int, name: str = None, description: str = None,
     dict
         return from api
     """
+    type_checking("list_sort_by", sort_by)
     _lists.reset()
     _lists.use("list-update")
     _lists.load_path_arg(list_id=list_id)
@@ -405,10 +408,9 @@ def _pack_items(items: list) -> dict:
     Parameters
     ----------
     items : list
-        Support three types of list.
-        There might be no comments for items; therefore, for tuples 
-        and lists, the length could be 2, and for dictionaries, the 
-        'comment' key might not be present. 
+        A list of items to add. It supports three types of list items:
+        Some items may not have comments. For tuples and lists, their length 
+        can be 2, while for dictionaries, the 'comment' key may be absent.
 
         1.
         ```

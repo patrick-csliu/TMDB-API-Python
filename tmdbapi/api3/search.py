@@ -3,6 +3,7 @@
 """
 
 from tmdbapi._core import Tmdb
+from tmdbapi.exceptions import type_checking
 
 
 _SEARCH_V3 = {
@@ -129,6 +130,8 @@ def movies(query: str, include_adult=False,
     """Search for movies by their original, translated and 
     alternative titles.
     """
+    type_checking("year", year)
+    type_checking("year", primary_release_year)
     _search.reset()
     _search.use("search-movie")
     _search.language(language)
@@ -171,6 +174,8 @@ def tv(query: str, include_adult=False, language: str = None,
     """Search for TV shows by their original, translated and also 
     known as names.
     """
+    type_checking("year", year)
+    type_checking("year", first_air_date_year)
     _search.reset()
     _search.use("search-tv")
     _search.language(language)

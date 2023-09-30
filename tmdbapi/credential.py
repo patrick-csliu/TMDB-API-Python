@@ -1,12 +1,15 @@
-"""Manage TMDB credentials
+"""Manage TMDB Credentials
 
-Access Token Auth, API Key Auth, and session_id.
+Provides functions for setting, saving, loading, and managing TMDB API
+credentials, including access tokens, API keys, session IDs, account 
+IDs, and account object IDs.
 """
 
 import os
 import pickle
 from typing import TypedDict, Optional
 
+import tmdbapi._core
 
 # Store credentials in global variables
 class CredentialType(TypedDict):
@@ -31,33 +34,34 @@ CREDENTIAL_FILE = None
 def set_credentials(access_token: str = None, api_key: str = None,
                      session_id: str = None, account_id: int = None,
                      account_object_id: str = None):
-    """Set the key, IDs, and token.
+    """Set API credentials.
 
-    This function will store these thing in the module global variable.
-    To keep the credentials in file, use `save_credentials()` after
-    load it.
+    This function stores the provided credentials in module global 
+    variables. To persist the credentials in a file, use 
+    `save_credentials()` after loading them.
 
     Parameters
     ----------
     access_token : str, optional
-        As Bearer token, if access_token is given, will use access_token 
-        in api version3 (api3) by default, to change the api_key
-        use `use_access_token(False)`. By default None
+        The Bearer token. If provided, it will be used as the access 
+        token in API version 3 (api3) by default. To change the API key
+        , use `use_access_token(False)`. Default is None.
     api_key : str, optional
-        For TMDB API version3, if access_token is given there is no
-        needed of api_key. For more information see: 
-        https://developer.themoviedb.org/docs/authentication-application.
-        By default None
+        The API key for TMDB API version 3. If an access_token is provided, 
+        there is no need for an api_key. For more information, 
+        see: https://developer.themoviedb.org/docs/authentication-application.
+        Default is None.
     session_id : str, optional
-        An id give permission to access, by default None
+        An ID granting permission to access resources. Default is None.
     account_id : int, optional
-        TMDB API version3 account id, by default None
+        The TMDB API version 3 account ID. Default is None.
     account_object_id : str, optional
-        TMDB API version4 account id, by default None
+        The TMDB API version 4 account ID. Default is None.
     """
     global CREDENTIALS
     if access_token is not None:
         CREDENTIALS["access_token"] = access_token
+        tmdbapi._core.SETTINGS["use_access_token"] = True
     if api_key is not None:
         CREDENTIALS["api_key"] = api_key
     if session_id is not None:
@@ -69,7 +73,7 @@ def set_credentials(access_token: str = None, api_key: str = None,
 
 
 def save_credentials(filepath: str = None):
-    """Save the credential to file.
+    """Save the credentials to file.
 
     This function saves the credentials to a file. Note that the 
     file is not encrypted, so it should be placed in a secure location.
@@ -90,7 +94,7 @@ def save_credentials(filepath: str = None):
         if path_exist:
             filepath = CREDENTIAL_FILE
         else:
-            raise Exception("No filepath")
+            raise ValueError("No filepath")
     with open(filepath, 'wb') as f:
         pickle.dump(CREDENTIALS, f)
 
@@ -98,22 +102,24 @@ def save_credentials(filepath: str = None):
 def load_credentials(filepath: str):
     """Load the credentials from file.
 
-    The format can't be customize, can only load from the file create
-    by save_credentials().
+    The format cannot be customized and can only be loaded from a file
+    created by `save_credentials()`.
 
     Parameters
     ----------
     filepath : str
-        The file path where the credentials will be loaded.
+        The file path where the credentials will be loaded from.
     """
     global CREDENTIALS, CREDENTIAL_FILE
     with open(filepath, 'rb') as f:
         CREDENTIALS = pickle.load(f)
     CREDENTIAL_FILE = filepath
+    if CREDENTIALS["access_token"] is not None:
+        tmdbapi._core.SETTINGS["use_access_token"] = True
 
 
 def set_env_var():
-    """Put the credentials in the environment variables.
+    """Set credentials as environment variables.
     """
     cred_env = {}
     var_names = {
@@ -133,7 +139,7 @@ def set_env_var():
 
 
 def load_env_var(customize_var_names={}):
-    """Read the credentials from the environment variables.
+    """Load credentials from environment variables.
 
     Parameters
     ----------
@@ -166,3 +172,5 @@ def load_env_var(customize_var_names={}):
         CREDENTIALS[k] = os.environ.get(v)
     if CREDENTIALS.get("account_id") is not None:
         CREDENTIALS["account_id"] = str(CREDENTIALS["account_id"])
+    if CREDENTIALS["access_token"] is not None:
+        tmdbapi._core.SETTINGS["use_access_token"] = True

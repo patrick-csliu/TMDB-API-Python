@@ -36,9 +36,7 @@ _certification = _Certification(_CERTIFICATION_V3)
 
 
 def movie_list() -> dict:
-    """Get an up to date list of the
-    officially supported movie
-    certifications on TMDB.
+    """Get an up to date list of the officially supported movie certifications on TMDB.
     """
     _certification.reset()
     _certification.use("certification-movie-list")

@@ -3,6 +3,7 @@
 """
 
 from tmdbapi._core import Tmdb
+from tmdbapi.exceptions import type_checking
 
 
 _TV_SERIES_V3 = {
@@ -220,7 +221,12 @@ def alternative_titles(series_id: int) -> dict:
 
 def changes(series_id: int, start_date="", end_date="", page=1) -> dict:
     """Get the recent changes for a TV show.
+    
+    `start_date` and `start_date` is lte and gte
+    Format: YYYY-MM-DD
     """
+    type_checking("date", start_date)
+    type_checking("date", end_date)
     _tv_series.reset()
     _tv_series.use("tv-series-changes")
     _tv_series.load_path_arg(series_id=series_id)
@@ -272,6 +278,10 @@ def external_ids(series_id: int) -> dict:
 def images(series_id: int,
            language: str = None, include_image_language: str = None) -> dict:
     """Get the images that belong to a TV series.
+    
+    include_image_language:
+    specify a comma separated list of ISO-639-1 values to query, 
+    for example: en,null
     """
     _tv_series.reset()
     _tv_series.use("")
@@ -352,6 +362,9 @@ def translations(series_id: int) -> dict:
 def videos(series_id: int,
            language: str = None, include_video_language: str = None) -> dict:
     """Get the videos that belong to a TV show.
+    
+    include_video_language:
+    filter the list results by language, supports more than one value by using a comma
     """
     _tv_series.reset()
     _tv_series.use("tv-series-videos")
@@ -373,7 +386,10 @@ def watch_providers(series_id: int) -> dict:
 
 def add_rating(series_id: int, rating: int, guest_session_id: str = None) -> dict:
     """Rate a TV show and save it to your rated list.
+
+    rating: 0~10
     """
+    type_checking("rating", rating)
     _tv_series.reset()
     _tv_series.use("tv-series-add-rating")
     _tv_series.load_path_arg(series_id=series_id)

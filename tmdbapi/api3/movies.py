@@ -3,7 +3,7 @@
 """
 
 from tmdbapi._core import Tmdb
-
+from tmdbapi.exceptions import type_checking
 
 _MOVIES_V3 = {
     "movie-account-states": {
@@ -195,6 +195,8 @@ def account_states(movie_id: str,
 
 def alternative_titles(movie_id: str, country: str = None) -> dict:
     """Get the alternative titles for a movie.
+
+    country: format ISO-3166-1
     """
     _movies.reset()
     _movies.use("movie-alternative-titles")
@@ -206,7 +208,12 @@ def alternative_titles(movie_id: str, country: str = None) -> dict:
 def changes(movie_id: str, start_date="", end_date="",
             page=1) -> dict:
     """Get the recent changes for a movie.
+
+    `start_date` and `start_date` is lte and gte
+    Format: YYYY-MM-DD
     """
+    type_checking("date", start_date)
+    type_checking("date", end_date)
     _movies.reset()
     _movies.use("movie-changes")
     _movies.load_path_arg(movie_id=movie_id)
@@ -238,6 +245,10 @@ def external_ids(movie_id: str) -> dict:
 def images(movie_id: str, include_image_language: str = None,
            language: str = None) -> dict:
     """Get the images that belong to a movie.
+
+    include_image_language:
+    specify a comma separated list of ISO-639-1 values to query, 
+    for example: en,null
     """
     _movies.reset()
     _movies.use("movie-images")
@@ -346,7 +357,10 @@ def watch_providers(movie_id: str) -> dict:
 def add_rating(movie_id: str, rating: int,
                guest_session_id: str = None) -> dict:
     """Rate a movie and save it to your rated list.
+    
+    rating: 0~10
     """
+    type_checking("rating", rating)
     _movies.reset()
     _movies.use("movie-add-rating")
     _movies.load_path_arg(movie_id=movie_id)

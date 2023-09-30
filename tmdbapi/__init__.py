@@ -17,5 +17,5 @@ def __getattr__(name):
         return _importlib.import_module(f'tmdbapi.{name}')
     else:
         raise AttributeError(
-            f"Module 'DIP' has no attribute '{name}'"
+            f"Package 'tmdbapi' has no attribute '{name}'"
         )

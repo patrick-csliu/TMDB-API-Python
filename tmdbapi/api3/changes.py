@@ -3,6 +3,7 @@
 """
 
 from tmdbapi._core import Tmdb
+from tmdbapi.exceptions import type_checking
 
 
 _CHANGES_V3 = {
@@ -53,6 +54,8 @@ class _Changes(Tmdb):
                     page=1) -> dict:
         """Wrap the same process for get th change list
         """
+        type_checking("date", start_date)
+        type_checking("date", end_date)
         self.reset()
         self.use(use_name)
         if start_date != "":
@@ -66,9 +69,11 @@ _changes = _Changes(_CHANGES_V3)
 
 
 def movie_list(start_date="", end_date="", page=1) -> dict:
-    """Get a list of all of the movie ids
-    that have been changed in the past 24
-    hours.
+    """Get a list of all of the movie ids that have been 
+    changed in the past 24 hours.
+
+    `start_date` and `start_date` is lte and gte
+    Format: YYYY-MM-DD
     """
     return _changes.change_list("changes-movie-list",
                                 start_date=start_date,
@@ -76,14 +81,22 @@ def movie_list(start_date="", end_date="", page=1) -> dict:
 
 
 def tv_list(start_date="", end_date="", page=1) -> dict:
-
+    """
+    
+    `start_date` and `start_date` is lte and gte
+    Format: YYYY-MM-DD
+    """
     return _changes.change_list("changes-tv-list",
                                 start_date=start_date,
                                 end_date=end_date, page=page)
 
 
 def person_list(start_date="", end_date="", page=1) -> dict:
-
+    """
+    
+    `start_date` and `start_date` is lte and gte
+    Format: YYYY-MM-DD
+    """
     return _changes.change_list("changes-people-list",
                                 start_date=start_date,
                                 end_date=end_date, page=page)

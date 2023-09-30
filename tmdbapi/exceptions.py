@@ -2,29 +2,24 @@
 Exceptions and Warnings
 =======================
 
-Exceptions used by tmdbapi.
+This module defines exceptions and warnings used by the `tmdbapi` package.
 
 Warnings
 --------
 
-   ComplexWarning             Given when converting complex to real.
-   VisibleDeprecationWarning  Same as a DeprecationWarning, but more visible.
-   RankWarning                Issued when the design matrix is rank deficient.
+    `ServiceDeprecationWarning`: This warning is raised when a service (protocol) is deprecated by TMDB.
 
 Exceptions
 ----------
 
-    AxisError          Given when an axis was invalid.
-    DTypePromotionError   Given when no common dtype could be found.
-    TooHardError       Error specific to `numpy.shares_memory`.
+    `TmdbApiException`: This exception is used to handle errors that occur when interacting with the TMDB API.
 
 """
 
 
-__all__ = [
-    "ComplexWarning", "VisibleDeprecationWarning", "ModuleDeprecationWarning",
-    "TooHardError", "AxisError", "DTypePromotionError"]
+__all__ = ["ServiceDeprecationWarning", "TmdbApiException"]
 
+# (tmdb_status_code, http_status_code, status_message)
 _status = [
     (1, 200, 'Success.'),
     (2, 501, 'Invalid service: this service does not exist.'),
@@ -75,6 +70,9 @@ _status = [
     (47, 400, 'The input is not valid.'),
 ]
 
+import re
+
+
 class ServiceDeprecationWarning(DeprecationWarning):
     """Service deprecation warning.
 
@@ -88,7 +86,7 @@ class ServiceDeprecationWarning(DeprecationWarning):
 class TmdbApiException(Exception):
     """TMDB API exception.
 
-    An exception handle the response of the TMDB API.
+    This exception is raised to handle errors that occur when interacting with the TMDB API.
 
     """
     pass
@@ -98,7 +96,28 @@ def type_checking(keyword, value):
     if keyword == "media_type":
         if value not in ("tv", "movie"):
             raise ValueError("Media Type should be 'tv' or 'movie'.")
-        
+    elif keyword == "date":
+        if not re.compile("^\d{4}-\d{2}-\d{2}$").match(value):
+            raise ValueError("Date format not YYYY-MM-DD")
+    elif keyword == "year":
+        if not re.compile("^\d{4}$").match(value):
+            raise ValueError("Year format not YYYY")
+    elif keyword == "time_window":
+        if value not in ("day", "week"):
+            raise ValueError("time_window should be 'day' or 'week'.")
+    elif keyword == "rating":
+        if 0<= value <= 10:
+            raise ValueError("The rating number should be 0~10")
+    elif keyword == "list_sort_by":
+        if value not in ("original_order.asc",
+                         "original_order.desc",
+                         "vote_average.asc",
+                         "vote_average.desc",
+                         "primary_release_date.asc",
+                         "primary_release_date.desc",
+                         "title.asc",
+                         "title.desc"):
+            raise ValueError("Media Type should be 'tv' or 'movie'.")
     else:
         return False
     return True

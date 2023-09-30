@@ -3,6 +3,7 @@
 """
 
 from tmdbapi._core import Tmdb
+from tmdbapi.exceptions import type_checking
 
 
 _TV_SEASONS_V3 = {
@@ -160,7 +161,12 @@ def aggregate_credits(series_id: int, season_number: int,
 def changes(season_id: int, start_date="", end_date="",
             page=1) -> dict:
     """Get the recent changes for a TV season.
+    
+    `start_date` and `start_date` is lte and gte
+    Format: YYYY-MM-DD
     """
+    type_checking("date", start_date)
+    type_checking("date", end_date)
     _tv_seasons.reset()
     _tv_seasons.use("tv-season-changes-by-id")
     _tv_seasons.load_path_arg(season_id=season_id)
@@ -196,6 +202,10 @@ def external_ids(series_id: int, season_number: int) -> dict:
 def images(series_id: int, season_number: int,
            language: str = None, include_image_language: str = None) -> dict:
     """Get the images that belong to a TV season.
+    
+    include_image_language:
+    specify a comma separated list of ISO-639-1 values to query, 
+    for example: en,null
     """
     _tv_seasons.reset()
     _tv_seasons.use("tv-season-images")
@@ -220,6 +230,9 @@ def translations(series_id: int, season_number: int) -> dict:
 def videos(series_id: int, season_number: int,
            language: str = None, include_video_language: str = None) -> dict:
     """Get the videos that belong to a TV season.
+    
+    include_video_language:
+    filter the list results by language, supports more than one value by using a comma
     """
     _tv_seasons.reset()
     _tv_seasons.use("tv-season-videos")

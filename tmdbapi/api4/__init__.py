@@ -1,4 +1,4 @@
-"""The version 3 of TMDB APIs.
+"""The version 4 of TMDB APIs.
 """
 
 from . import account, auth, lists

@@ -62,6 +62,9 @@ _tv_series_lists = _TvSeriesLists(_TV_SERIES_LISTS_V3)
 def airing_today(page=1, language: str = None,
                  timezone: str = None) -> dict:
     """Get a list of TV shows airing today.
+
+    timezone:
+    Get the list of timezones from configuration.timezones
     """
     _tv_series_lists.reset()
     _tv_series_lists.use("tv-series-airing-today-list")
@@ -75,6 +78,9 @@ def airing_today(page=1, language: str = None,
 def on_the_air(page=1, language: str = None,
                timezone: str = None) -> dict:
     """Get a list of TV shows that air in the next 7 days.
+    
+    timezone:
+    Get the list of timezones from configuration.timezones
     """
     _tv_series_lists.reset()
     _tv_series_lists.use("tv-series-on-the-air-list")

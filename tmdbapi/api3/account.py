@@ -141,10 +141,10 @@ class _Account(Tmdb):
         )
     
     def check_account_id(self):
-        """Check whether `account_id` exists
+        """Check if `account_id` exists.
         
-        Check whether `account_id` is exist, if no run details()
-        to get the `account_id`.
+        This method checks whether an `account_id` exists. If it doesn't, 
+        it runs the 'details()' function to obtain the `account_id`.
         """
         if CREDENTIALS["account_id"] is None:
             details()
