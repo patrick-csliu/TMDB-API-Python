@@ -3,6 +3,7 @@
 """
 
 from tmdbapi._core import Tmdb
+from tmdbapi.exceptions import ServiceDeprecationWarning
 
 
 _KEYWORDS_V3 = {
@@ -51,6 +52,7 @@ def details(keyword_id: int) -> dict:
 def movies(keyword_id: int, include_adult=False,
            language: str = None, page=1) -> dict:
 
+    ServiceDeprecationWarning("keywords.movies method is deprecated, you should use discover.movie instead.")
     _keywords.reset()
     _keywords.use("keyword-movies")
     _keywords.load_path_arg(keyword_id=keyword_id)

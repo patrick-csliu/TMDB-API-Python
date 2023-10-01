@@ -2,11 +2,16 @@
 The Core of the TMDb Request API
 """
 
+from logging.handlers import TimedRotatingFileHandler
+from pathlib import Path
+from typing import Optional, TypedDict
+
 import requests
 
+import tmdbapi
 import tmdbapi.credential
+
 from .exceptions import TmdbApiException
-from typing import TypedDict, Optional
 
 # try:
 #     from functools import lru_cache
@@ -23,6 +28,7 @@ class SettingsType(TypedDict):
     default_language: Optional[str]
     default_region: Optional[str]
     use_session: bool
+    log_file: Optional[str]
 
 SETTINGS: SettingsType = {
         # "tmdb_cache_enable": True,
@@ -30,8 +36,10 @@ SETTINGS: SettingsType = {
         "timeout": None,
         "default_language": None,
         "default_region": None,
-        "use_session": False
+        "use_session": False,
+        "log_file": None,
 }
+
 
 class Tmdb:
     """The Tmdb class provides a Python interface for making requests to the TMDb (The Movie Database) API.
@@ -378,7 +386,7 @@ class Tmdb:
                                     timeout=SETTINGS["timeout"])
 
         # debug print #
-        print(response.url)
+        tmdbapi.LOGGER.info(f"{method}: {response.url}")
         # handle response
         headers = response.headers
         header_status_code = response.status_code
@@ -394,7 +402,7 @@ class Tmdb:
         else:
             TmdbApiException(f"status_code: {header_status_code}",
                              "No content.")
-        print(f"status_code: {header_status_code}")
+        tmdbapi.LOGGER.debug(f"status_code: {header_status_code}")
         is_success = content.get("success", None)
         if is_success is not None and is_success == False:
             raise TmdbApiException(content["status_message"])
@@ -469,7 +477,8 @@ def settings(**kwargs):
         "timeout": None,
         "default_language": None,
         "default_region": None,
-        "use_session": False
+        "use_session": False,
+        "log_file": None,
     }
     ```
     Raises
@@ -484,5 +493,15 @@ def settings(**kwargs):
             Tmdb.session = requests.Session()
         else:
             Tmdb.session = None
+    if "log_file" in kwargs.keys() and kwargs["log_file"] != SETTINGS["log_file"]:
+        if kwargs["log_file"] is not None:
+            path = kwargs["log_file"]
+            Path(path).mkdir(parents=True, exist_ok=True)
+            filename = str(Path(path) / "TMDB.log")
+            ch2 = TimedRotatingFileHandler(filename, when='h', interval=1)
+            ch2.setFormatter(tmdbapi.LOG_FORMATTER)
+            ch2.namer = lambda name: name.replace(".log", "") + ".log"
+            tmdbapi.LOGGER.addHandler(ch2)
+        else:
+            tmdbapi.LOGGER.handlers.pop()
     SETTINGS.update(kwargs)
-        

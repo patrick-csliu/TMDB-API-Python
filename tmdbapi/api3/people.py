@@ -4,6 +4,7 @@
 
 from tmdbapi._core import Tmdb
 from tmdbapi.exceptions import type_checking
+from tmdbapi.exceptions import ServiceDeprecationWarning
 
 
 _PEOPLE_V3 = {
@@ -203,6 +204,7 @@ def tv_credits(person_id: int, language: str = None) -> dict:
 def tagged_images(person_id: int, page=1) -> dict:
     """Get the tagged images for a person.
     """
+    ServiceDeprecationWarning("people.tagged_images method is deprecated.")
     _people.reset()
     _people.use("person-tagged-images")
     _people.load_path_arg(person_id=person_id)

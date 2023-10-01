@@ -270,3 +270,5 @@ credential
 test*.py
 test*.ipynb
 out/
+log/
+*.log

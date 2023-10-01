@@ -71,16 +71,19 @@ _status = [
 ]
 
 import re
+import tmdbapi
 
 
-class ServiceDeprecationWarning(DeprecationWarning):
+class ServiceDeprecationWarning():
     """Service deprecation warning.
 
     Use this waring when the Service(protocol) is deprecate by TMDB.
     By default, python will not show deprecation warnings.
 
     """
-    pass
+    def __init__(self, *message):
+        msg = ", ".join(message)
+        tmdbapi.LOGGER.warning(f"ServiceDeprecationWarning: {msg}")
 
 
 class TmdbApiException(Exception):
@@ -89,7 +92,9 @@ class TmdbApiException(Exception):
     This exception is raised to handle errors that occur when interacting with the TMDB API.
 
     """
-    pass
+    def __init__(self, *message):
+        msg = ", ".join(message)
+        tmdbapi.LOGGER.warning(f"TmdbApiException: {msg}")
 
 
 def type_checking(keyword, value):
