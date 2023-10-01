@@ -1,4 +1,4 @@
-from ...api3 import genres
+from tmdbapi.api3 import genres
 
 
 def test_movie_list():

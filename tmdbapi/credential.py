@@ -10,6 +10,7 @@ import pickle
 from pathlib import Path
 from typing import Optional, TypedDict
 
+import tmdbapi
 import tmdbapi._core
 
 
@@ -61,6 +62,7 @@ def set_credentials(access_token: str = None, api_key: str = None,
         The TMDB API version 4 account ID. Default is None.
     """
     global CREDENTIALS
+    pre_cred = CREDENTIALS.copy()
     if access_token is not None:
         CREDENTIALS["access_token"] = access_token
         tmdbapi._core.SETTINGS["use_access_token"] = True
@@ -72,6 +74,12 @@ def set_credentials(access_token: str = None, api_key: str = None,
         CREDENTIALS["account_id"] = account_id
     if account_object_id is not None:
         CREDENTIALS["account_object_id"] = account_object_id
+    if CREDENTIAL_FILE is not None:
+        save_credentials()
+    change = dict(set(pre_cred.items()) ^ set(CREDENTIALS.items()))
+    if change:
+        change_str = ", ".join(change)
+        tmdbapi.LOGGER.info(f"Credential update: {change_str}")
 
 
 def save_credentials(filepath: str = None):
@@ -101,6 +109,7 @@ def save_credentials(filepath: str = None):
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(filepath, 'wb') as f:
         pickle.dump(CREDENTIALS, f)
+    tmdbapi.LOGGER.info(f"Credential store at {path.absolute()}")
 
 
 def load_credentials(filepath: str):
@@ -118,8 +127,11 @@ def load_credentials(filepath: str):
     with open(filepath, 'rb') as f:
         CREDENTIALS = pickle.load(f)
     CREDENTIAL_FILE = filepath
-    if CREDENTIALS["access_token"] is not None:
+    if CREDENTIALS["access_token"] is None:
+        tmdbapi._core.SETTINGS["use_access_token"] = False
+    else:
         tmdbapi._core.SETTINGS["use_access_token"] = True
+    tmdbapi.LOGGER.info(f"Credential loaded successful.")
 
 
 def set_env_var():
@@ -140,10 +152,14 @@ def set_env_var():
     if cred_env.get("TMDB_ACCOUNT_ID") is not None:
         cred_env["TMDB_ACCOUNT_ID"] = str(cred_env["TMDB_ACCOUNT_ID"])
     os.environ.update(cred_env)
+    tmdbapi.LOGGER.info(f"Set credentials as environment variables.")
 
 
 def load_env_var(customize_var_names={}):
     """Load credentials from environment variables.
+
+    Note: This function will clear previous credential, to save run
+    `save_credentials`
 
     Parameters
     ----------
@@ -178,3 +194,4 @@ def load_env_var(customize_var_names={}):
         CREDENTIALS["account_id"] = int(CREDENTIALS["account_id"])
     if CREDENTIALS["access_token"] is not None:
         tmdbapi._core.SETTINGS["use_access_token"] = True
+    tmdbapi.LOGGER.info(f"Load credentials from environment variables.")

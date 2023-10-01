@@ -1,4 +1,4 @@
-from ...api3 import changes
+from tmdbapi.api3 import changes
 
 
 def test_movie_list():

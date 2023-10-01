@@ -1,4 +1,4 @@
-from ...api3 import networks
+from tmdbapi.api3 import networks
 
 
 def test_alternative_names():

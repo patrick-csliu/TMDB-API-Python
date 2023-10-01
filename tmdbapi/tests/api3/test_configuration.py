@@ -1,4 +1,4 @@
-from ...api3 import configuration
+from tmdbapi.api3 import configuration
 
 
 def test_countries():

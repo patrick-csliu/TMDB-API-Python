@@ -1,4 +1,4 @@
-from ...api3 import movie_lists
+from tmdbapi.api3 import movie_lists
 
 
 def test_now_playing():

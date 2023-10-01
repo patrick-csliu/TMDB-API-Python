@@ -1,4 +1,4 @@
-from ...api3 import search
+from tmdbapi.api3 import search
 
 
 def test_collections():

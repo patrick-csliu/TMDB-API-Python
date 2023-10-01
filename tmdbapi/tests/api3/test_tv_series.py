@@ -1,4 +1,4 @@
-from ...api3 import tv_series
+from tmdbapi.api3 import tv_series
 
 
 def test_account_states():

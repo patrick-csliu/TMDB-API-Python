@@ -6,6 +6,7 @@
 import importlib as _importlib
 import logging as _logging
 
+from . import api3, api4
 from ._core import settings
 from .credential import load_credentials, save_credentials, set_credentials
 

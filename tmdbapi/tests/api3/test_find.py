@@ -1,4 +1,4 @@
-from ...api3 import find
+from tmdbapi.api3 import find
 
 
 def test_find():

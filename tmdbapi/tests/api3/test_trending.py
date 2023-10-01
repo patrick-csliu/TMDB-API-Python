@@ -1,4 +1,4 @@
-from ...api3 import trending
+from tmdbapi.api3 import trending
 
 
 def test_all():

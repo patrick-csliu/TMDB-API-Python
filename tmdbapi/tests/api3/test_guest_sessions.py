@@ -1,4 +1,4 @@
-from ...api3 import guest_sessions
+from tmdbapi.api3 import guest_sessions
 
 
 def test_rated_movies():

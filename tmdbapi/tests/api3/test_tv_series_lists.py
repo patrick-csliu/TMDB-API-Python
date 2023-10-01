@@ -1,4 +1,4 @@
-from ...api3 import tv_series_lists
+from tmdbapi.api3 import tv_series_lists
 
 
 def test_airing_today():

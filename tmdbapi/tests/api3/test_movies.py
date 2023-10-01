@@ -1,4 +1,4 @@
-from ...api3 import movies
+from tmdbapi.api3 import movies
 
 
 def test_account_states():

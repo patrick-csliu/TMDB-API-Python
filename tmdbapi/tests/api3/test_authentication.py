@@ -1,4 +1,4 @@
-from ...api3 import authentication
+from tmdbapi.api3 import authentication
 
 
 def test_create_guest_session():

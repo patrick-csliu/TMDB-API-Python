@@ -2,7 +2,7 @@
 
 """
 
-from tmdbapi.credential import CREDENTIALS, save_credentials
+from tmdbapi.credential import CREDENTIALS, set_credentials
 from tmdbapi._core import Tmdb
 from tmdbapi.exceptions import type_checking
 
@@ -148,7 +148,6 @@ class _Account(Tmdb):
         """
         if CREDENTIALS["account_id"] is None:
             details()
-            save_credentials()
 
 _account = _Account(_ACCOUNT_V3)
 
@@ -160,7 +159,7 @@ def details() -> dict:
     json = _account.request()
     id = json['id']
     if CREDENTIALS["account_id"] != id:
-        CREDENTIALS["account_id"] = id
+        set_credentials(account_id=id)
     return json
 
 

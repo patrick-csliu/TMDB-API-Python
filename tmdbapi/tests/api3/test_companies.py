@@ -1,4 +1,4 @@
-from ...api3 import companies
+from tmdbapi.api3 import companies
 
 
 def test_alternative_names():

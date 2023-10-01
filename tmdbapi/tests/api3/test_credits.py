@@ -1,4 +1,4 @@
-from ...api3 import credits
+from tmdbapi.api3 import credits
 
 
 def test_details():

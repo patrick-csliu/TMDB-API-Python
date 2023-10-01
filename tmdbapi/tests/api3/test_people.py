@@ -1,4 +1,4 @@
-from ...api3 import people
+from tmdbapi.api3 import people
 
 
 def test_changes():

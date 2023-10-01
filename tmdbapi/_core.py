@@ -2,6 +2,8 @@
 The Core of the TMDb Request API
 """
 
+import sys
+import webbrowser
 from logging.handlers import TimedRotatingFileHandler
 from pathlib import Path
 from typing import Optional, TypedDict
@@ -9,7 +11,6 @@ from typing import Optional, TypedDict
 import requests
 
 import tmdbapi
-import tmdbapi.credential
 
 from .exceptions import TmdbApiException
 
@@ -93,7 +94,7 @@ class Tmdb:
     _headers = {"accept": "application/json",}
     session = requests.Session()
     base_path = ""
-    info_var: dict = None
+    info_var = None
 
     def __init__(self):
         self._ref: str = None    # (Relative) path for service
@@ -128,7 +129,17 @@ class Tmdb:
 
     # def cache_clear(self):
     #     return self.cached_request.cache_clear()
-    
+    def _create_session_id(self):
+        """Create a session id
+        """
+        request_token = tmdbapi.api3.authentication.create_request_token()["request_token"]
+        approve_url = f'https://www.themoviedb.org/authenticate/{request_token}'
+        webbrowser.open(approve_url, new=2)
+        msg = f"Please approve the 3rd Party Authentication Request in your web browser. If the webpage doesn't open, you can copy and paste the following URL manually: {approve_url}.\nAfter approval, enter 'y' to continue."
+        query_yes_no(msg)
+        session_id =  tmdbapi.api3.authentication.create_session(request_token)["session_id"]
+        tmdbapi.credential.set_credentials(session_id=session_id)
+
     def _authentication(self, headers: dict, params: dict) -> tuple[dict, dict]:
         """Set the headers and query parameters based on the 'use_access_token' setting.
 
@@ -149,10 +160,14 @@ class Tmdb:
             token = tmdbapi.credential.CREDENTIALS["access_token"]
             headers["Authorization"] = f"Bearer {token}"
         else:
-            params["api_key"] = tmdbapi.credential.CREDENTIALS["api_key"]
+            if tmdbapi.credential.CREDENTIALS["api_key"] is None:
+                tmdbapi.LOGGER.error("No api_key given, please set the api_key")
+                raise Exception("No api_key given, please set the api_key")
+            else:
+                params["api_key"] = tmdbapi.credential.CREDENTIALS["api_key"]
         return headers, params
 
-    def check_token(self) -> dict:
+    def check_token(self, state=0) -> Optional[dict]:
         """Check if the application is currently using an access_token or api_key.
 
         If an access_token is used, there is no need for session_id.
@@ -162,10 +177,26 @@ class Tmdb:
         dict
             A dictionary with query parameters.
         """
+        # Check if session_id exists. If it doesn't, force the use of 
+        # access_token. If both session_id and access_token don't exist
+        # , then create session_id.
+        has_session_id =  tmdbapi.credential.CREDENTIALS["session_id"] is not None
         if SETTINGS["use_access_token"]:
             return {}
         else:
-            return {"session_id": tmdbapi.credential.CREDENTIALS["session_id"]}
+            if has_session_id:
+                return {"session_id": tmdbapi.credential.CREDENTIALS["session_id"]}
+            else:
+                if state == 0:
+                    settings(use_access_token=True)
+                    return self.check_token(1)
+                elif state == 1:
+                    tmdbapi.LOGGER.info("No session_id, creating a session_id.")
+                    self._create_session_id()
+                    return self.check_token(2)
+                else:
+                    tmdbapi.LOGGER.error("Unable to retrieve the session_id.")
+                    RuntimeError("Unable to retrieve the session_id.")
 
     def choose_session_id(self, guest_session_id: str):
         """Choose a session_id based on the provided 'guest_session_id' or use the default 'session_id'.
@@ -473,6 +504,7 @@ def settings(**kwargs):
     """
     if not set(kwargs.keys()).issubset(SETTINGS.keys()):
         raise KeyError("The setting you have provided is not among the available options.")
+    pre_setting = SETTINGS.copy()
     if "use_session" in kwargs.keys() and kwargs["use_session"] != SETTINGS["use_session"]:
         if kwargs["use_session"]:
             Tmdb.session = requests.Session()
@@ -489,4 +521,43 @@ def settings(**kwargs):
             tmdbapi.LOGGER.addHandler(ch2)
         else:
             tmdbapi.LOGGER.handlers.pop()
+    if (kwargs.get("use_access_token")
+        and tmdbapi.credential.CREDENTIALS["access_token"] is None):
+        del kwargs["use_access_token"]
+        tmdbapi.LOGGER.warning("access_token does not exist, use_access_token remain False.")
     SETTINGS.update(kwargs)
+    change = dict(set(pre_setting.items()) ^ set(SETTINGS.items()))
+    if change:
+        change_str = ", ".join(change)
+        tmdbapi.LOGGER.info(f"Settings update: {change_str}")
+
+
+def query_yes_no(question, default="yes"):
+    """Ask a yes/no question via raw_input() and return their answer.
+
+    "question" is a string that is presented to the user.
+    "default" is the presumed answer if the user just hits <Enter>.
+            It must be "yes" (the default), "no" or None (meaning
+            an answer is required of the user).
+
+    The "answer" return value is True for "yes" or False for "no".
+    """
+    valid = {"yes": True, "y": True, "ye": True, "no": False, "n": False}
+    if default is None:
+        prompt = " [y/n] "
+    elif default == "yes":
+        prompt = " [Y/n] "
+    elif default == "no":
+        prompt = " [y/N] "
+    else:
+        raise ValueError("invalid default answer: '%s'" % default)
+
+    while True:
+        sys.stdout.write(question + prompt)
+        choice = input().lower()
+        if default is not None and choice == "":
+            return valid[default]
+        elif choice in valid:
+            return valid[choice]
+        else:
+            sys.stdout.write("Please respond with 'yes' or 'no' " "(or 'y' or 'n').\n")

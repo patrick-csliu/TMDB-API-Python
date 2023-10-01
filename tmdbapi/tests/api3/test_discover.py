@@ -1,4 +1,4 @@
-from ...api3 import discover
+from tmdbapi.api3 import discover
 
 
 def test_movies():

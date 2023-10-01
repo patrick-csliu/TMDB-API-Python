@@ -1,4 +1,4 @@
-from ...api3 import collections
+from tmdbapi.api3 import collections
 
 
 def test_details():

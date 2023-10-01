@@ -1,4 +1,4 @@
-from ...api3 import watch_providers
+from tmdbapi.api3 import watch_providers
 
 
 def test_available_regions():

@@ -1,21 +1,22 @@
-import pytest
-import tmdbapi
-import sys
 import os
+import sys
 from pathlib import Path
+
+import pytest
+
+import tmdbapi
+
+CREDENTIAL_PATH = "tmdbapi/tests/temp/test0.credential"
 
 @pytest.fixture(autouse=True)
 def reload_package():
-    global tmdbapi  # reach the global scope
-    import tmdbapi  # reimport package every before test
-    yield           # run test
-
     # delete all modules from package
     loaded_package_modules = [key for key, value in sys.modules.items() if "tmdbapi" in str(value)]
     for key in loaded_package_modules:
         del sys.modules[key]
-
-CREDENTIAL_PATH = "tmdbapi/tests/temp/test.credential"
+    global tmdbapi  # reach the global scope
+    import tmdbapi  # reimport package every before test
+    yield           # run test
 
 
 class TestCredentials:
@@ -103,9 +104,14 @@ class TestSettings:
         with pytest.raises(KeyError):
             tmdbapi.settings(wrong_name=True)
 
-    def test_use_access_token(self):
+    def test_use_access_token1(self):
+        tmdbapi.credential.set_credentials(access_token='1')
         tmdbapi.settings(use_access_token=True)
         assert tmdbapi._core.SETTINGS['use_access_token'] == True
+
+    def test_use_access_token2(self):
+        tmdbapi.settings(use_access_token=True)
+        assert tmdbapi._core.SETTINGS['use_access_token'] == False
 
     def test_use_session(self):
         import requests
@@ -120,7 +126,6 @@ class TestSettings:
         import logging
         tmdbapi.settings(log_file="tmdbapi/tests/temp")
         logger = logging.getLogger("TMDB")
-        print(logger.handlers)
         logger.critical('test message')
         pytest.assume(Path("tmdbapi/tests/temp/TMDB.log").exists())
         tmdbapi.settings(log_file=None)

@@ -1,4 +1,4 @@
-from ...api3 import keywords
+from tmdbapi.api3 import keywords
 
 
 def test_details():
