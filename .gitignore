@@ -267,8 +267,11 @@ credential
 *.credential
 
 ### test
-test*.py
+test.py
+test payload.py
+test_obj.py
 test*.ipynb
 out/
 log/
 *.log
+tmdbapi/tests/temp

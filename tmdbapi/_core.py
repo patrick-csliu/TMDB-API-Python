@@ -410,21 +410,6 @@ class Tmdb:
             return content
 
 
-def use_access_token(use: bool):
-    """Specify whether to use an access_token or not.
-
-    Parameters
-    ----------
-    use : bool
-        True: Use the access_token.
-        False: Use the api_key.
-    """
-    if use and credential_check(("access_token")):
-        SETTINGS["use_access_token"] = True
-    else:
-        SETTINGS["use_access_token"] = False
-
-
 def credential_check(needed: str) -> bool:
     """Check if the needed credentials exist.
 
@@ -487,7 +472,7 @@ def settings(**kwargs):
         If the setting not in the Settings options.
     """
     if not set(kwargs.keys()).issubset(SETTINGS.keys()):
-        raise KeyError("The setting you given if not the options")
+        raise KeyError("The setting you have provided is not among the available options.")
     if "use_session" in kwargs.keys() and kwargs["use_session"] != SETTINGS["use_session"]:
         if kwargs["use_session"]:
             Tmdb.session = requests.Session()

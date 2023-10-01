@@ -2,7 +2,7 @@
 
 """
 
-from tmdbapi._core import Tmdb, use_access_token
+from tmdbapi._core import Tmdb, settings
 from tmdbapi.exceptions import type_checking
 
 _LISTS_V4 = {
@@ -75,7 +75,7 @@ class _Lists(Tmdb):
         self.info_var = info_var
 
     def request(self) -> dict:
-        use_access_token(True)
+        settings(use_access_token=True)
         url = self.build_url(4)
         return self.request_raw(
             url = url,

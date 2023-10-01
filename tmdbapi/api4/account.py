@@ -3,7 +3,7 @@
 """
 
 
-from tmdbapi._core import Tmdb, use_access_token
+from tmdbapi._core import Tmdb, settings
 from tmdbapi.credential import CREDENTIALS
 
 
@@ -99,7 +99,7 @@ class _Account(Tmdb):
         self.info_var = info_var
 
     def request(self) -> dict:
-        use_access_token(True)
+        settings(use_access_token=True)
         url = self.build_url(4)
         return self.request_raw(
             url = url,

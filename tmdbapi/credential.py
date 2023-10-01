@@ -7,9 +7,11 @@ IDs, and account object IDs.
 
 import os
 import pickle
-from typing import TypedDict, Optional
+from pathlib import Path
+from typing import Optional, TypedDict
 
 import tmdbapi._core
+
 
 # Store credentials in global variables
 class CredentialType(TypedDict):
@@ -45,7 +47,7 @@ def set_credentials(access_token: str = None, api_key: str = None,
     access_token : str, optional
         The Bearer token. If provided, it will be used as the access 
         token in API version 3 (api3) by default. To change the API key
-        , use `use_access_token(False)`. Default is None.
+        , use `settings(use_access_token=False)`. Default is None.
     api_key : str, optional
         The API key for TMDB API version 3. If an access_token is provided, 
         there is no need for an api_key. For more information, 
@@ -95,6 +97,8 @@ def save_credentials(filepath: str = None):
             filepath = CREDENTIAL_FILE
         else:
             raise ValueError("No filepath")
+    path = Path(filepath)
+    path.parent.mkdir(parents=True, exist_ok=True)
     with open(filepath, 'wb') as f:
         pickle.dump(CREDENTIALS, f)
 
@@ -171,6 +175,6 @@ def load_env_var(customize_var_names={}):
     for k, v in var_names.items():
         CREDENTIALS[k] = os.environ.get(v)
     if CREDENTIALS.get("account_id") is not None:
-        CREDENTIALS["account_id"] = str(CREDENTIALS["account_id"])
+        CREDENTIALS["account_id"] = int(CREDENTIALS["account_id"])
     if CREDENTIALS["access_token"] is not None:
         tmdbapi._core.SETTINGS["use_access_token"] = True
