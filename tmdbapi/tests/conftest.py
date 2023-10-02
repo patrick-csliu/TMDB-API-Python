@@ -24,3 +24,7 @@ def pytest_configure():
 
 def pytest_unconfigure():
     shutil.rmtree("tmdbapi/tests/temp", ignore_errors=True)
+
+
+class DataSharing:
+    id = None

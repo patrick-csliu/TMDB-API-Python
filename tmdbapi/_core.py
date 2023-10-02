@@ -12,7 +12,7 @@ import requests
 
 import tmdbapi
 
-from .exceptions import TmdbApiException
+from .exceptions import TmdbApiException, STATUS
 
 # try:
 #     from functools import lru_cache
@@ -431,8 +431,7 @@ class Tmdb:
                 TmdbApiException("The content is not json. Content:",
                                  content)
         else:
-            TmdbApiException(f"status_code: {header_status_code}",
-                             "No content.")
+            TmdbApiException("No content.")
         if isinstance(content, dict):
             is_success = content.get("success", None)
             if is_success is not None and is_success == False:

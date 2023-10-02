@@ -1,77 +1,98 @@
-from tmdbapi.api3 import movies
+import sys
+
+import pytest
+
+import tmdbapi
+
+
+def setup_module():
+    loaded_package_modules = [key for key, value in sys.modules.items() if "tmdbapi" in str(value)]
+    for key in loaded_package_modules:
+        del sys.modules[key]
+    global tmdbapi  # reach the global scope
+    import tmdbapi  # reimport package every before test
+    tmdbapi.load_credentials("tmdbapi/tests/temp/test.credential")
+
+MOVIE_ID = 372058
 
 
 def test_account_states():
-    pass
+    tmdbapi.api3.movies.account_states(MOVIE_ID)
 
 
-def test_add_rating():
-    pass
+# def test_account_states_guest_session():
+#     tmdbapi.api3.movies.account_states()
 
 
 def test_alternative_titles():
-    pass
+    tmdbapi.api3.movies.alternative_titles(MOVIE_ID, "TW")
 
 
 def test_changes():
-    pass
+    tmdbapi.api3.movies.changes(MOVIE_ID, "2017-01-01", "2017-01-15")
 
 
 def test_credits():
-    pass
+    tmdbapi.api3.movies.credits(MOVIE_ID, "en-US")
 
 
+@pytest.mark.dependency(name='add_rate', scope='module')
+def test_add_rating():
+    tmdbapi.api3.movies.add_rating(MOVIE_ID, 6)
+
+
+@pytest.mark.dependency(depends=["add_rate"], scope='module')
 def test_delete_rating():
-    pass
+    tmdbapi.api3.movies.delete_rating(MOVIE_ID)
 
 
 def test_details():
-    pass
+    tmdbapi.api3.movies.details(MOVIE_ID, language="zh-TW")
 
 
 def test_external_ids():
-    pass
+    tmdbapi.api3.movies.external_ids(MOVIE_ID)
 
 
 def test_images():
-    pass
+    tmdbapi.api3.movies.images(MOVIE_ID, include_image_language="zh")
 
 
 def test_keywords():
-    pass
+    tmdbapi.api3.movies.keywords(MOVIE_ID)
 
 
 def test_latest():
-    pass
+    tmdbapi.api3.movies.latest()
 
 
 def test_lists():
-    pass
+    tmdbapi.api3.movies.lists(MOVIE_ID)
 
 
 def test_recommendations():
-    pass
+    tmdbapi.api3.movies.recommendations(MOVIE_ID, language="zh-TW")
 
 
 def test_release_dates():
-    pass
+    tmdbapi.api3.movies.release_dates(MOVIE_ID)
 
 
 def test_reviews():
-    pass
+    tmdbapi.api3.movies.reviews(MOVIE_ID, language="zh-TW")
 
 
 def test_similar():
-    pass
+    tmdbapi.api3.movies.similar(MOVIE_ID, language="zh-TW")
 
 
 def test_translations():
-    pass
+    tmdbapi.api3.movies.translations(MOVIE_ID)
 
 
 def test_videos():
-    pass
+    tmdbapi.api3.movies.videos(MOVIE_ID, language="zh-TW")
 
 
 def test_watch_providers():
-    pass
+    tmdbapi.api3.movies.watch_providers(MOVIE_ID)

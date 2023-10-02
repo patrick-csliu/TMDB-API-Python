@@ -184,7 +184,7 @@ def details(movie_id: str,
 
 def account_states(movie_id: str,
                    guest_session_id: str = None) -> dict:
-    """Get the rating, watchlist and favourite status of an account.
+    """Get the rating, watchlist and favorite status of an account.
     """
     _movies.reset()
     _movies.use("movie-account-states")

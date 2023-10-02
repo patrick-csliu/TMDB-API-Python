@@ -116,7 +116,7 @@ def clear(list_id: int) -> dict:
     _lists.use("list-clear")
     _lists.load_path_arg(list_id=list_id)
     _lists.load_query(_lists.check_token())
-    _lists.load_query(confirm=True)
+    _lists.load_query(confirm="true")
     return _lists.request()
 
 

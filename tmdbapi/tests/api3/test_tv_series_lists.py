@@ -1,17 +1,31 @@
-from tmdbapi.api3 import tv_series_lists
+import sys
+
+import tmdbapi
+
+
+def setup_module():
+    loaded_package_modules = [key for key, value in sys.modules.items() if "tmdbapi" in str(value)]
+    for key in loaded_package_modules:
+        del sys.modules[key]
+    global tmdbapi  # reach the global scope
+    import tmdbapi  # reimport package every before test
+    tmdbapi.load_credentials("tmdbapi/tests/temp/test.credential")
+
+LANGUAGE = "en-US"
+TIMEZONE = "Asia/Taipei"
 
 
 def test_airing_today():
-    pass
+    tmdbapi.api3.tv_series_lists.airing_today(language=LANGUAGE, timezone=TIMEZONE)
 
 
 def test_on_the_air():
-    pass
+    tmdbapi.api3.tv_series_lists.on_the_air(language=LANGUAGE, timezone=TIMEZONE)
 
 
 def test_popular():
-    pass
+    tmdbapi.api3.tv_series_lists.popular(language=LANGUAGE)
 
 
 def test_top_rated():
-    pass
+    tmdbapi.api3.tv_series_lists.top_rated(language=LANGUAGE)
