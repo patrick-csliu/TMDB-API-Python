@@ -1,17 +1,35 @@
-from tmdbapi.api3 import trending
+import sys
+
+import tmdbapi
+
+
+def setup_module():
+    loaded_package_modules = [key for key, value in sys.modules.items() if "tmdbapi" in str(value)]
+    for key in loaded_package_modules:
+        del sys.modules[key]
+    global tmdbapi  # reach the global scope
+    import tmdbapi  # reimport package every before test
+    tmdbapi.load_credentials("tmdbapi/tests/temp/test.credential")
+
+TEST1 = ["week", "zh-TW"]
+TEST2 = ["day", "en-US"]
 
 
 def test_all():
-    pass
+    tmdbapi.api3.trending.all(*TEST1)
 
 
 def test_movies():
-    pass
+    tmdbapi.api3.trending.movies(*TEST1)
 
 
 def test_people():
-    pass
+    tmdbapi.api3.trending.people(*TEST2)
 
 
 def test_tv():
-    pass
+    tmdbapi.api3.trending.tv(*TEST1)
+
+
+def test_type_checking():
+    tmdbapi.api3.trending.type_checking(*TEST2)

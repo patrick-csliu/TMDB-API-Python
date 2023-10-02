@@ -1,5 +1,7 @@
 """API v3 networks category
 
+The network id is available at: http://files.tmdb.org/p/exports/tv_network_ids_MM_DD_YYYY.json.gz
+More information: https://developer.themoviedb.org/docs/daily-id-exports
 """
 
 from tmdbapi._core import Tmdb

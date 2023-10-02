@@ -34,6 +34,6 @@ def details(review_id: str) -> dict:
     """Retrieve the details of a movie or TV show review.
     """
     _review.reset()
-    _review.use("collection-details")
+    _review.use("review-details")
     _review.load_path_arg(review_id=review_id)
     return _review.request()
