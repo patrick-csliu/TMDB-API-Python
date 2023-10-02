@@ -271,8 +271,9 @@ class Tmdb:
         str
             The URL without query parameters.
         """
-        self._ref = self._ref.format(**self._path_args)
-        return f"{API_BASE}/{version}{self.base_path}{self._ref}"
+        ref = f"{self.base_path}{self._ref}"
+        ref = ref.format(**self._path_args)
+        return f"{API_BASE}/{version}{ref}"
 
     def sortby(self, asc: bool):
         """Update the query by specifying ascending or descending sorting order.
@@ -416,29 +417,27 @@ class Tmdb:
                                     params=params, headers=headers,
                                     timeout=SETTINGS["timeout"])
 
-        # debug print #
-        tmdbapi.LOGGER.info(f"{method}: {response.url}")
-        # handle response
         headers = response.headers
         header_status_code = response.status_code
+        # debug print #
+        tmdbapi.LOGGER.info(f"status_code: {header_status_code}, {method}: {response.url}")
+        # handle response
         has_content = headers.get("content-length", "1") != "0"
         if has_content:
             if headers.get("Content-Type", "").startswith("application/json"):
                 content =  response.json()
             else:
-                TmdbApiException(f"status_code: {header_status_code}",
-                                 "The content is not json. Content:",
-                                 response.content)
-                content = response.content
+                content = response.text
+                TmdbApiException("The content is not json. Content:",
+                                 content)
         else:
             TmdbApiException(f"status_code: {header_status_code}",
                              "No content.")
-        tmdbapi.LOGGER.debug(f"status_code: {header_status_code}")
-        is_success = content.get("success", None)
-        if is_success is not None and is_success == False:
-            raise TmdbApiException(content["status_message"])
-        else:
-            return content
+        if isinstance(content, dict):
+            is_success = content.get("success", None)
+            if is_success is not None and is_success == False:
+                raise TmdbApiException(content["status_message"])
+        return content
 
 
 def credential_check(needed: str) -> bool:

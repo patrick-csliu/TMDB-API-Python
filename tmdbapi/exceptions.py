@@ -122,7 +122,11 @@ def type_checking(keyword, value):
                          "primary_release_date.desc",
                          "title.asc",
                          "title.desc"):
-            raise ValueError("Media Type should be 'tv' or 'movie'.")
+            raise ValueError("The value in sort_by is not support.")
+    if keyword == "external_source":
+        if value not in ('imdb_id', 'facebook_id', 'instagram_id', 'tvdb_id',
+                         'tiktok_id', 'twitter_id', 'wikidata_id', 'youtube_id'):
+            raise ValueError("The value in external_source is not support.")
     else:
         return False
     return True

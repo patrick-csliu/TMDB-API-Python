@@ -48,7 +48,7 @@ _collection = _Collection(_COLLECTION_V3)
 
 
 def details(collection_id: int, language: str = None) -> dict:
-    """Get collection details by ID.
+    """Get collection (movie series) details by ID.
     """
     _collection.reset()
     _collection.use("collection-details")
