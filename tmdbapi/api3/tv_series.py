@@ -225,14 +225,14 @@ def changes(series_id: int, start_date="", end_date="", page=1) -> dict:
     `start_date` and `start_date` is lte and gte
     Format: YYYY-MM-DD
     """
-    type_checking("date", start_date)
-    type_checking("date", end_date)
     _tv_series.reset()
     _tv_series.use("tv-series-changes")
     _tv_series.load_path_arg(series_id=series_id)
     if start_date != "":
+        type_checking("date", start_date)
         _tv_series.load_query(start_date=start_date)
     if end_date != "":
+        type_checking("date", end_date)
         _tv_series.load_query(end_date=end_date)
     _tv_series.load_query(page=page)
     return _tv_series.request()
@@ -284,7 +284,7 @@ def images(series_id: int,
     for example: en,null
     """
     _tv_series.reset()
-    _tv_series.use("")
+    _tv_series.use("tv-series-images")
     _tv_series.load_path_arg(series_id=series_id)
     _tv_series.language(language)
     if include_image_language is not None:

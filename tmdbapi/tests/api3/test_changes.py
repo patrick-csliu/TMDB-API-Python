@@ -1,5 +1,7 @@
 import sys
 
+import pytest
+
 import tmdbapi
 
 
@@ -17,6 +19,8 @@ TEST = ["2023-07-23", "2023-07-27", 3] # [start_date, end_date, page]
 def test_movie_list():
     tmdbapi.api3.changes.movie_list(*TEST)
 
+def test_movie_list2():
+    tmdbapi.api3.changes.movie_list()
 
 def test_person_list():
     tmdbapi.api3.changes.person_list(*TEST)
@@ -24,3 +28,18 @@ def test_person_list():
 
 def test_tv_list():
     tmdbapi.api3.changes.tv_list(*TEST)
+
+
+class TestDataError:
+
+    def test_movie_list_error1(self):
+        with pytest.raises(ValueError):
+            tmdbapi.api3.changes.movie_list("2023-7-23", "2023-07-27", 3)
+
+    def test_movie_list_error2(self):
+        with pytest.raises(ValueError):
+            tmdbapi.api3.changes.movie_list("2023-07-1", "2023-07-10", 3)
+
+    def test_movie_list_error3(self):
+        with pytest.raises(ValueError):
+            tmdbapi.api3.changes.movie_list("202-07-23", "202-07-27", 3)

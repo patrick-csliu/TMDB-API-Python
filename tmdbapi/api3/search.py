@@ -1,5 +1,7 @@
 """API v3 search category
 
+query: Use '+' between the keywords
+    For more information: https://developer.themoviedb.org/docs/search-and-query-for-details
 """
 
 from tmdbapi._core import Tmdb
@@ -101,7 +103,7 @@ def collections(query: str, include_adult=False, page=1,
     _search.use("search-collection")
     _search.language(language)
     _search.region(region)
-    _search.load_query(query=query, include_adult=include_adult, page=page)
+    _search.load_query({"query": query}, include_adult=include_adult, page=page)
     return _search.request()
 
 
@@ -110,7 +112,7 @@ def companies(query: str, page=1) -> dict:
     """
     _search.reset()
     _search.use("search-company")
-    _search.load_query(query=query, page=page)
+    _search.load_query({"query": query}, page=page)
     return _search.request()
 
 
@@ -119,28 +121,28 @@ def keywords(query: str, page=1) -> dict:
     """
     _search.reset()
     _search.use("search-keyword")
-    _search.load_query(query=query, page=page)
+    _search.load_query({"query": query}, page=page)
     return _search.request()
 
 
 def movies(query: str, include_adult=False,
            language: str = None, region: str = None,
-           year: str = None, primary_release_year: str = None,
+           year: str = "", primary_release_year: str = "",
            page=1) -> dict:
     """Search for movies by their original, translated and 
     alternative titles.
     """
-    type_checking("year", year)
-    type_checking("year", primary_release_year)
     _search.reset()
     _search.use("search-movie")
     _search.language(language)
     _search.region(region)
-    _search.load_query(query=query, include_adult=include_adult,
+    _search.load_query({"query": query}, include_adult=include_adult,
                        page=page)
-    if year is not None:
+    if year != "":
+        type_checking("year", year)
         _search.load_query(year=year)
-    if primary_release_year is not None:
+    if primary_release_year != "":
+        type_checking("year", primary_release_year)
         _search.load_query(primary_release_year=primary_release_year)
     return _search.request()
 
@@ -153,7 +155,7 @@ def multi(query: str, include_adult=False, language: str = None,
     _search.reset()
     _search.use("search-multi")
     _search.language(language)
-    _search.load_query(query=query, include_adult=include_adult, page=page)
+    _search.load_query({"query": query}, include_adult=include_adult, page=page)
     return _search.request()
 
 
@@ -164,25 +166,25 @@ def person(query: str, include_adult=False, language: str = None,
     _search.reset()
     _search.use("search-person")
     _search.language(language)
-    _search.load_query(query=query, include_adult=include_adult, page=page)
+    _search.load_query({"query": query}, include_adult=include_adult, page=page)
     return _search.request()
 
 
 def tv(query: str, include_adult=False, language: str = None,
-       year: str = None, first_air_date_year: str = None,
+       year: str = "", first_air_date_year: str = "",
        page=1) -> dict:
     """Search for TV shows by their original, translated and also 
     known as names.
     """
-    type_checking("year", year)
-    type_checking("year", first_air_date_year)
     _search.reset()
     _search.use("search-tv")
     _search.language(language)
-    _search.load_query(query=query, include_adult=include_adult,
+    _search.load_query({"query": query}, include_adult=include_adult,
                        page=page)
-    if year is not None:
+    if year != "":
+        type_checking("year", year)
         _search.load_query(year=year)
-    if first_air_date_year is not None:
+    if first_air_date_year != "":
+        type_checking("year", first_air_date_year)
         _search.load_query(first_air_date_year=first_air_date_year)
     return _search.request()

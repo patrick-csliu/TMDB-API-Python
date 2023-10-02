@@ -14,7 +14,7 @@ _GUEST_SESSIONS_V3 = {
             {"in": "query", "name": "page"},
             {"in": "query", "name": "sort_by"},
         ],
-        "url": "/3/guest_session/{guest_session_id}/rated/movies",
+        "url": "/{guest_session_id}/rated/movies",
     },
     "guest-session-rated-tv": {
         "method": "get",

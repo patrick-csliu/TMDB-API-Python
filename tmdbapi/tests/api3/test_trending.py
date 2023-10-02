@@ -29,7 +29,3 @@ def test_people():
 
 def test_tv():
     tmdbapi.api3.trending.tv(*TEST1)
-
-
-def test_type_checking():
-    tmdbapi.api3.trending.type_checking(*TEST2)

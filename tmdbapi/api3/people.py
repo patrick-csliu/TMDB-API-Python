@@ -131,14 +131,14 @@ def changes(person_id: int, start_date="", end_date="",
     `start_date` and `start_date` is lte and gte
     Format: YYYY-MM-DD
     """
-    type_checking("date", start_date)
-    type_checking("date", end_date)
     _people.reset()
     _people.use("person-changes")
     _people.load_path_arg(person_id=person_id)
     if start_date != "":
+        type_checking("date", start_date)
         _people.load_query(start_date=start_date)
     if end_date != "":
+        type_checking("date", end_date)
         _people.load_query(end_date=end_date)
     _people.load_query(page=page)
     return _people.request()

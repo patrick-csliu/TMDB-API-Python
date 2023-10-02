@@ -54,13 +54,13 @@ class _Changes(Tmdb):
                     page=1) -> dict:
         """Wrap the same process for get th change list
         """
-        type_checking("date", start_date)
-        type_checking("date", end_date)
         self.reset()
         self.use(use_name)
         if start_date != "":
+            type_checking("date", start_date)
             self.load_query(start_date=start_date)
         if end_date != "":
+            type_checking("date", end_date)
             self.load_query(end_date=end_date)
         self.load_query(page=page)
         return self.request()

@@ -212,14 +212,14 @@ def changes(movie_id: str, start_date="", end_date="",
     `start_date` and `start_date` is lte and gte
     Format: YYYY-MM-DD
     """
-    type_checking("date", start_date)
-    type_checking("date", end_date)
     _movies.reset()
     _movies.use("movie-changes")
     _movies.load_path_arg(movie_id=movie_id)
     if start_date != "":
+        type_checking("date", start_date)
         _movies.load_query(start_date=start_date)
     if end_date != "":
+        type_checking("date", end_date)
         _movies.load_query(end_date=end_date)
     _movies.load_query(page=page)
     return _movies.request()

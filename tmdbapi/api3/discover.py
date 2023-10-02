@@ -108,15 +108,12 @@ class _Discover(Tmdb):
 _discover = _Discover(_DISCOVER_V3)
 
 
-def movies(params: dict = None, **kwargs) -> dict:
+def movies(params: dict = {}, **kwargs) -> dict:
     """Find movies using over 30 filters and sort options.
     """
     _discover.reset()
     _discover.use("discover-movie")
-    if params is None:
-        params = kwargs
-    else:
-        params.update(kwargs)
+    params.update(kwargs)
     if not _discover.check_params(params):
         raise KeyError("The keyword in params is invalid")
     _discover.load_query(params)
@@ -125,17 +122,14 @@ def movies(params: dict = None, **kwargs) -> dict:
     return _discover.request()
 
 
-def tv(params: dict = None, **kwargs) -> dict:
+def tv(params: dict = {}, **kwargs) -> dict:
     """Find TV shows using over 30 filters and sort options.
     """
     _discover.reset()
     _discover.use("discover-tv")
-    if params is None:
-        params = kwargs
-    else:
-        params.update(kwargs)
+    params.update(kwargs)
     if not _discover.check_params(params):
-        raise Exception("params error")
+        raise KeyError("params error")
     _discover.load_query(params)
     _discover.language(params.get("language", None))
     _discover.region(params.get("region", None))

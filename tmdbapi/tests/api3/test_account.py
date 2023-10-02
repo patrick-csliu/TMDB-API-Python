@@ -1,5 +1,7 @@
 import sys
 
+import pytest
+
 import tmdbapi
 
 
@@ -85,3 +87,13 @@ def test_rated_tv_episodes():
 
 def test_rated_tv_shows():
     print(tmdbapi.api3.account.rated_tv_shows(asc_sort=True, language=LANGUAGE))
+
+
+def test_add_favorite_error():
+    with pytest.raises(ValueError):
+        tmdbapi.api3.account.add_favorite(MOVIE[0], "apple")
+
+
+def test_add_to_watchlist_error():
+    with pytest.raises(ValueError):
+        tmdbapi.api3.account.add_to_watchlist(MOVIE[0], "apple")

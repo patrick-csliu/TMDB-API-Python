@@ -389,6 +389,8 @@ class Tmdb:
             method = method.upper()
         if params is None:
             params = self._query
+        params = {k: str(v).lower() if isinstance(v, bool) else v
+                    for k, v in params.items()}
         if json is None:
             json = self._json
         headers, params = self._authentication(headers=self._headers.copy(),
