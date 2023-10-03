@@ -2,7 +2,10 @@
 
 """
 
-from tmdbapi._core import Tmdb
+import webbrowser
+from tmdbapi._core import Tmdb, query_yes_no
+
+from tmdbapi import credential
 
 
 _AUTH_V4 = {
@@ -63,3 +66,16 @@ def logout(access_token: str) -> dict:
     _auth.use("auth-logout")
     _auth.load_json({"access_token": access_token})
     return _auth.request()
+
+
+def access_token():
+    """Create a write permission access_token
+    """
+    request_token = create_request_token()["request_token"]
+    approve_url = f'https://www.themoviedb.org/auth/access?request_token={request_token}'
+    webbrowser.open(approve_url, new=2)
+    msg = f"Please approve the 3rd Party Authentication Request in your web browser. If the webpage doesn't open, you can copy and paste the following URL manually: {approve_url}.\nAfter approval, enter 'y' to continue."
+    query_yes_no(msg)
+    response =  create_access_token(request_token)
+    credential.set_credentials(access_token=response["access_token"])
+    return response
