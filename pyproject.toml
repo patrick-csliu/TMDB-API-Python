@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tmdbapi"
+version = "v0.0.1"
+license = {file = "LICENSE"}
+authors = [
+  { name="Patrick Liu", email="32678320+patrick-csliu@users.noreply.github.com"}
+]
+maintainers = [
+  { name="Patrick Liu", email="32678320+patrick-csliu@users.noreply.github.com"}
+]
+description = "TheMovieDB (TMDB) API Python Library"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "pytest",
+  "Requests",
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Topic :: Internet",
+    "Operating System :: OS Independent",
+    "License :: OSI Approved :: MIT License",
+]
+
+[project.urls]
+Homepage = "https://github.com/patrick-csliu/TMDB-API-Python"
+"Bug Tracker" = "https://github.com/patrick-csliu/TMDB-API-Python/issues"
+Repository = "https://github.com/patrick-csliu/TMDB-API-Python.git"
+# Documentation = "" # No doc currently
+# Changelog = "" # No change log currently
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = "--pyargs tmdbapi -rF"
+required_plugins = "pytest-assume pytest-dependency"
