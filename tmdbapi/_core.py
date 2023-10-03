@@ -2,44 +2,164 @@
 The Core of the TMDb Request API
 """
 
-import sys
-import webbrowser
 from logging.handlers import TimedRotatingFileHandler
 from pathlib import Path
-from typing import Optional, TypedDict
+from typing import Optional
+import json as Json
 
 import requests
 
 import tmdbapi
-
-from .exceptions import TmdbApiException, STATUS
-
-# try:
-#     from functools import lru_cache
-# except ImportError:
-#     from backports.functools_lru_cache import lru_cache
+from tmdbapi.exceptions import STATUS, TmdbApiException
 
 
-API_BASE = "https://api.themoviedb.org"
+class Setting:
+    """Settings
 
-# SETTINGS
-class SettingsType(TypedDict):
-    use_access_token: bool
-    timeout: float | tuple[float, float] | tuple[float, None] | None
-    default_language: Optional[str]
-    default_region: Optional[str]
-    use_session: bool
-    log_file: Optional[str]
-
-SETTINGS: SettingsType = {
-        # "tmdb_cache_enable": True,
+    ```
+    Default settings:
+    {
         "use_access_token": False,
         "timeout": None,
         "default_language": None,
         "default_region": None,
         "use_session": False,
         "log_file": None,
-}
+        "credential": None,
+    }
+    ```
+    """
+
+    def __init__(self):
+        self.setting = {
+            "use_access_token": False,
+            "timeout": None,
+            "default_language": None,
+            "default_region": None,
+            "use_session": False,
+            "log_file": None,
+            "credential": None,
+        }
+
+    def __getitem__(self, key):
+        return self.setting[key]
+
+    def __repr__(self):
+        return repr(self.setting)
+
+    def __str__(self):
+        return str(self.setting)
+
+    def __eq__(self, other):
+        return self.setting == other
+
+    def __ne__(self, other):
+        return self.setting != other
+    
+    def pprint(self):
+        pprint(self.setting)
+
+    def _check_cred_exist(self):
+        if self.setting["credential"] is None:
+            return False
+        else:
+            return True
+
+    def set(self, **kwargs):
+        """Change settings.
+
+        ```
+        Default settings:
+        {
+            "use_access_token": False,
+            "timeout": None,
+            "default_language": None,
+            "default_region": None,
+            "use_session": False,
+            "log_file": None,
+            "credential": None,
+        }
+        ```
+        Raises
+        ------
+        KeyError
+            If the parameter not in the Settings options.
+        """
+        settings = kwargs.keys()
+        if not set(settings).issubset(self.setting.keys()):
+            raise KeyError(
+                "The setting you have provided is not among the available options."
+            )
+        if "use_access_token" in settings:
+            self.use_access_token(kwargs["use_access_token"])
+        if "timeout" in settings:
+            self.timeout(kwargs["timeout"])
+        if "default_language" in settings:
+            self.language(kwargs["default_language"])
+        if "default_region" in settings:
+            self.region(kwargs["default_region"])
+        if "use_session" in settings:
+            self.use_session(kwargs["use_session"])
+        if "log_file" in settings:
+            self.log(kwargs["log_file"])
+        if "credential" in settings:
+            self.use_cred(kwargs["credential"])
+
+    def use_access_token(self, use: bool):
+        if self._check_cred_exist():
+            cred = self.setting["credential"]
+        else:
+            raise Exception("Please setup the credential.")
+        if use != self.setting["use_access_token"]:
+            if not cred.pass_check("access_token"):
+                tmdbapi.LOGGER.warning(
+                    "access_token does not exist, use_access_token remain False."
+                )
+            else:
+                self.setting["use_access_token"] = use
+                tmdbapi.LOGGER.info(f'Setting: "use_access_token": {use}.')
+
+    def timeout(self, timeout: Optional[float | tuple] = None):
+        self.setting["timeout"] = timeout
+        tmdbapi.LOGGER.info(f'Setting: "timeout": {timeout}.')
+
+    def language(self, language: Optional[str]):
+        self.setting["default_language"] = language
+        tmdbapi.LOGGER.info(f'Setting: "default_language": {language}.')
+
+    def region(self, region: Optional[str]):
+        self.setting["default_region"] = region
+        tmdbapi.LOGGER.info(f'Setting: "default_region": {region}.')
+
+    def use_session(self, use: bool):
+        if use != self.setting["use_session"]:
+            if use:
+                tmdbapi._SESSION = requests.Session()
+            else:
+                tmdbapi._SESSION = None
+            self.setting["use_session"] = use
+            tmdbapi.LOGGER.info(f'Setting: "use_session": {use}.')
+
+    def log(self, directory: Optional[str]):
+        if directory != self.setting["log_file"]:
+            if directory is None:
+                tmdbapi.LOGGER.handlers.pop()
+                tmdbapi.LOGGER.info(f"Setting: Disable log file.")
+            else:
+                Path(directory).mkdir(parents=True, exist_ok=True)
+                filename = str(Path(directory) / "TMDB.log")
+                ch2 = TimedRotatingFileHandler(filename, when="h", interval=1)
+                ch2.setFormatter(tmdbapi.LOG_FORMATTER)
+                ch2.namer = lambda name: name.replace(".log", "") + ".log"
+                tmdbapi.LOGGER.addHandler(ch2)
+                tmdbapi.LOGGER.info(f"Setting: Log files at: {directory}.")
+            self.setting["log_file"] = directory
+
+    def use_cred(self, credential):
+        self.setting["credential"] = credential
+        tmdbapi.LOGGER.info(
+            f"Setting: Your credentials have been successfully set in the settings."
+        )
 
 
 class Tmdb:
@@ -50,9 +170,9 @@ class Tmdb:
 
         session (requests.Session): A session for making HTTP requests.
 
-        base_path (str): The base path for each API category.
+        category_path (str): The base path for each API category.
 
-        info_var (dict): The information dictionary for each API category. This dictionary contains HTTP request 
+        info_var (dict): The information dictionary for each API category. This dictionary contains HTTP request
             method, path, and parameters for each service.
 
     Methods:
@@ -82,7 +202,7 @@ class Tmdb:
         language(self, lang: str = None): Update the language parameter in the query.
 
         region(self, region: str = None): Update the region parameter in the query.
-        
+
         reset(self): Clear all content in class variables.
 
         check_params(self, params: dict) -> bool: Check if the given parameters keys are all valid.
@@ -91,56 +211,27 @@ class Tmdb:
             the API request and handle the response.
 
     """
-    _headers = {"accept": "application/json",}
-    session = requests.Session()
-    base_path = ""
-    info_var = None
+
+    headers = {
+        "accept": "application/json",
+    }
+    api_base = "https://api.themoviedb.org"
 
     def __init__(self):
-        self._ref: str = None    # (Relative) path for service
-        self._method: str = None # Http(s) request method
-        self._json: dict = None   # Json payload
-        self._query = {}    # Queries for url
-        self._path_args = {}    # the parameter to replace the anchor
-                                # in _ref
+        self.category_path = ""  # Relative path for each category.
+        self.info_var = None  # Store the information for each category.
+        # Relative path for service (service also call api method).
+        self._ref: str = ""
+        self._method: str = ""  # http(s) request method.
+        self._json: dict = None  # Json payload.
+        self._query = {}  # Query(parameters) for url.
+        self._path_args = {}  # The values to replace the anchor in url.
+        if tmdbapi.setting["credential"] is None:
+            raise Exception("No credential given.")
+        else:
+            self._cred = tmdbapi.setting["credential"]
 
-    # @property
-    # def wait_on_rate_limit(self):
-    #     return SETTINGS["tmdb_wait_on_rate_limit"]
-
-    # @wait_on_rate_limit.setter
-    # def wait_on_rate_limit(self, wait_on_rate_limit):
-    #     SETTINGS["tmdb_wait_on_rate_limit"] = wait_on_rate_limit
-
-    # @property
-    # def cache(self):
-    #     return SETTINGS["tmdb_cache_enable"]
-
-    # @cache.setter
-    # def cache(self, cache):
-    #     SETTINGS["tmdb_cache_enable"] = cache
-
-    # @staticmethod
-    # @lru_cache()
-    # def cached_request(method, url, params, headers):
-    #     return requests.request(method, url, params=params,
-    #                             proxies=SETTINGS["tmdb_proxies"], headers=headers,
-    #                             timeout=SETTINGS["timeout"])
-
-    # def cache_clear(self):
-    #     return self.cached_request.cache_clear()
-    def _create_session_id(self):
-        """Create a session id
-        """
-        request_token = tmdbapi.api3.authentication.create_request_token()["request_token"]
-        approve_url = f'https://www.themoviedb.org/authenticate/{request_token}'
-        webbrowser.open(approve_url, new=2)
-        msg = f"Please approve the 3rd Party Authentication Request in your web browser. If the webpage doesn't open, you can copy and paste the following URL manually: {approve_url}.\nAfter approval, enter 'y' to continue."
-        query_yes_no(msg)
-        session_id =  tmdbapi.api3.authentication.create_session(request_token)["session_id"]
-        tmdbapi.credential.set_credentials(session_id=session_id)
-
-    def _authentication(self, headers: dict, params: dict) -> tuple[dict, dict]:
+    def _api_auth(self, headers: dict, params: dict) -> tuple[dict, dict]:
         """Set the headers and query parameters based on the 'use_access_token' setting.
 
         Parameters
@@ -148,7 +239,7 @@ class Tmdb:
         headers : dict
             The headers dictionary.
         params : dict
-            The headers dictionary. 
+            The headers dictionary.
 
         Returns
         -------
@@ -156,18 +247,18 @@ class Tmdb:
             (headers, query)
             A tuple containing the updated headers and query parameters.
         """
-        if SETTINGS["use_access_token"]:
-            token = tmdbapi.credential.CREDENTIALS["access_token"]
+        if tmdbapi.setting["use_access_token"]:
+            token = self._cred["access_token"]
             headers["Authorization"] = f"Bearer {token}"
         else:
-            if tmdbapi.credential.CREDENTIALS["api_key"] is None:
-                tmdbapi.LOGGER.error("No api_key given, please set the api_key")
-                raise Exception("No api_key given, please set the api_key")
+            if self._cred.pass_check("api_key"):
+                params["api_key"] = self._cred["api_key"]
             else:
-                params["api_key"] = tmdbapi.credential.CREDENTIALS["api_key"]
+                tmdbapi.LOGGER.error("No api_key given, please set the api_key.")
+                raise Exception("No api_key given, please set the api_key.")
         return headers, params
 
-    def check_token(self, state=0) -> Optional[dict]:
+    def check_token(self) -> Optional[dict]:
         """Check if the application is currently using an access_token or api_key.
 
         If an access_token is used, there is no need for session_id.
@@ -177,26 +268,22 @@ class Tmdb:
         dict
             A dictionary with query parameters.
         """
-        # Check if session_id exists. If it doesn't, force the use of 
+        # Check if session_id exists. If it doesn't, force the use of
         # access_token. If both session_id and access_token don't exist
         # , then create session_id.
-        has_session_id =  tmdbapi.credential.CREDENTIALS["session_id"] is not None
-        if SETTINGS["use_access_token"]:
+        if tmdbapi.setting["use_access_token"]:
             return {}
         else:
-            if has_session_id:
-                return {"session_id": tmdbapi.credential.CREDENTIALS["session_id"]}
+            if self._cred.pass_check("session_id"):
+                return {"session_id": self._cred["session_id"]}
             else:
-                if state == 0:
-                    settings(use_access_token=True)
-                    return self.check_token(1)
-                elif state == 1:
-                    tmdbapi.LOGGER.info("No session_id, creating a session_id.")
-                    self._create_session_id()
-                    return self.check_token(2)
+                if self._cred.pass_check("access_token"):
+                    tmdbapi.settings(use_access_token=True)
+                    return self.check_token()
                 else:
-                    tmdbapi.LOGGER.error("Unable to retrieve the session_id.")
-                    RuntimeError("Unable to retrieve the session_id.")
+                    tmdbapi.LOGGER.info("No session_id, creating a session_id.")
+                    tmdbapi.integration.auth.create_session_id()
+                    return {"session_id": self._cred["session_id"]}
 
     def choose_session_id(self, guest_session_id: str):
         """Choose a session_id based on the provided 'guest_session_id' or use the default 'session_id'.
@@ -271,9 +358,9 @@ class Tmdb:
         str
             The URL without query parameters.
         """
-        ref = f"{self.base_path}{self._ref}"
+        ref = f"{self.category_path}{self._ref}"
         ref = ref.format(**self._path_args)
-        return f"{API_BASE}/{version}{ref}"
+        return f"{self.api_base}/{version}{ref}"
 
     def sortby(self, asc: bool):
         """Update the query by specifying ascending or descending sorting order.
@@ -285,11 +372,11 @@ class Tmdb:
             False: Sort in descending order.
         """
         if asc:
-            s =  {"sort_by": "created_at.asc"}
+            s = {"sort_by": "created_at.asc"}
         else:
-            s =  {"sort_by": "created_at.desc"}
+            s = {"sort_by": "created_at.desc"}
         self._query.update(s)
-    
+
     def language(self, lang: str = None):
         """Update the language parameter in the query.
 
@@ -304,8 +391,8 @@ class Tmdb:
         """
         if lang is not None:
             s = {"language": lang}
-        elif SETTINGS["default_language"] is not None:
-            s = {"language": SETTINGS["default_language"]}
+        elif tmdbapi.setting["default_language"] is not None:
+            s = {"language": tmdbapi.setting["default_language"]}
         else:
             s = {}
         self._query.update(s)
@@ -320,15 +407,14 @@ class Tmdb:
         """
         if region is not None:
             s = {"region": region}
-        elif SETTINGS["default_language"] is not None:
-            s = {"region": SETTINGS["default_region"]}
+        elif tmdbapi.setting["default_language"] is not None:
+            s = {"region": tmdbapi.setting["default_region"]}
         else:
             s = {}
         self._query.update(s)
 
     def reset(self):
-        """Reset all content in instance variables.
-        """
+        """Reset all content in instance variables."""
         self._ref = None
         self._method = None
         self._json = None
@@ -355,7 +441,14 @@ class Tmdb:
             params_name.append(p["name"])
         return set(params.keys()).issubset(set(params_name))
 
-    def request_raw(self, url: str, method: str = None, params: dict = None, data=None, json: dict = None) -> dict:
+    def request_raw(
+        self,
+        url: str,
+        method: str = None,
+        params: dict = None,
+        data=None,
+        json: dict = None,
+    ) -> dict:
         """Send a request and handle the response.
 
         Parameters
@@ -389,49 +482,55 @@ class Tmdb:
             method = method.upper()
         if params is None:
             params = self._query
-        params = {k: str(v).lower() if isinstance(v, bool) else v
-                    for k, v in params.items()}
+        params = {
+            k: str(v).lower() if isinstance(v, bool) else v for k, v in params.items()
+        }
         if json is None:
             json = self._json
-        headers, params = self._authentication(headers=self._headers.copy(),
-                                               params=params)
+        headers, params = self._api_auth(headers=self.headers.copy(), params=params)
         if json is not None:
             headers["content-type"] = "application/json"
-        
+
         # debug print #
         print("json:", json)
         print(method, headers)
 
         # send request to tmdb api
         #
-        if SETTINGS["use_session"]:
+        if tmdbapi.setting["use_session"]:
             request = self.session
         else:
             request = requests
         # if self.cache and method == "GET":
-            # response = self.cached_request(method, url, params=params,
-            #                                headers=headers)
-            # response = request.request(method, url, params=params,
-            #                            headers=headers)
+        # response = self.cached_request(method, url, params=params,
+        #                                headers=headers)
+        # response = request.request(method, url, params=params,
+        #                            headers=headers)
         # else:
-        response = request.request(method, url, data=data,
-                                    json=json, #proxies=self.proxies,
-                                    params=params, headers=headers,
-                                    timeout=SETTINGS["timeout"])
+        response = request.request(
+            method,
+            url,
+            data=data,
+            json=json,  # proxies=self.proxies,
+            params=params,
+            headers=headers,
+            timeout=tmdbapi.setting["timeout"],
+        )
 
         headers = response.headers
         header_status_code = response.status_code
         # debug print #
-        tmdbapi.LOGGER.info(f"status_code: {header_status_code}, {method}: {response.url}")
+        tmdbapi.LOGGER.info(
+            f"status_code: {header_status_code}, {method}: {response.url}"
+        )
         # handle response
         has_content = headers.get("content-length", "1") != "0"
         if has_content:
             if headers.get("Content-Type", "").startswith("application/json"):
-                content =  response.json()
+                content = response.json()
             else:
                 content = response.text
-                TmdbApiException("The content is not json. Content:",
-                                 content)
+                TmdbApiException("The content is not json. Content:", content)
         else:
             TmdbApiException("No content.")
         if isinstance(content, dict):
@@ -441,98 +540,7 @@ class Tmdb:
         return content
 
 
-def credential_check(needed: str) -> bool:
-    """Check if the needed credentials exist.
-
-    Parameters
-    ----------
-    needed : str
-        valid values:
-        'access_token', 'api_key', 'session_id', 'account_object_id'
-
-    Returns
-    -------
-    bool
-        Return True if the needed credential exist.
-
-    Raises
-    ------
-    ExceptionGroup
-        If the needed credentials do not exist.
-    """
-    token_type = (
-        "access_token",
-        "api_key",
-        "session_id",
-        "account_object_id"
-    )
-    token_exist = [tmdbapi.credential.CREDENTIALS[token] is not None for token in token_type]
-    exceptions = [
-        Exception("You must set up an access token before making this request. Please configure your access token settings to proceed."),
-        Exception("You must set up an api_key before making this request. Please configure your api_key settings to proceed."),
-        Exception("You must set up an session_id before making this request. Please configure your session_id settings to proceed."),
-        Exception("You must set up an account_object_id before making this request. Please configure your account_object_id settings to proceed."),
-    ]
-    errors = []
-    for i in range(4):
-        if token_type[i] in needed and not token_exist[i]:
-            errors.append(exceptions[i])
-    if len(errors) != 0:
-        raise ExceptionGroup("Missing credential", errors)
-    else:
-        return True
-
-
-def settings(**kwargs):
-    """Modify settings
-
-    ```
-    Default settings:
-    {
-        "use_access_token": False,
-        "timeout": None,
-        "default_language": None,
-        "default_region": None,
-        "use_session": False,
-        "log_file": None,
-    }
-    ```
-    Raises
-    ------
-    ValueError
-        If the setting not in the Settings options.
-    """
-    if not set(kwargs.keys()).issubset(SETTINGS.keys()):
-        raise KeyError("The setting you have provided is not among the available options.")
-    pre_setting = SETTINGS.copy()
-    if "use_session" in kwargs.keys() and kwargs["use_session"] != SETTINGS["use_session"]:
-        if kwargs["use_session"]:
-            Tmdb.session = requests.Session()
-        else:
-            Tmdb.session = None
-    if "log_file" in kwargs.keys() and kwargs["log_file"] != SETTINGS["log_file"]:
-        if kwargs["log_file"] is not None:
-            path = kwargs["log_file"]
-            Path(path).mkdir(parents=True, exist_ok=True)
-            filename = str(Path(path) / "TMDB.log")
-            ch2 = TimedRotatingFileHandler(filename, when='h', interval=1)
-            ch2.setFormatter(tmdbapi.LOG_FORMATTER)
-            ch2.namer = lambda name: name.replace(".log", "") + ".log"
-            tmdbapi.LOGGER.addHandler(ch2)
-        else:
-            tmdbapi.LOGGER.handlers.pop()
-    if (kwargs.get("use_access_token")
-        and tmdbapi.credential.CREDENTIALS["access_token"] is None):
-        del kwargs["use_access_token"]
-        tmdbapi.LOGGER.warning("access_token does not exist, use_access_token remain False.")
-    SETTINGS.update(kwargs)
-    change = dict(set(pre_setting.items()) ^ set(SETTINGS.items()))
-    if change:
-        change_str = ", ".join(change)
-        tmdbapi.LOGGER.info(f"Settings update: {change_str}")
-
-
-def query_yes_no(question, default="yes"):
+def query_yes_no(question: str, default="yes"):
     """Ask a yes/no question via raw_input() and return their answer.
 
     "question" is a string that is presented to the user.
@@ -553,11 +561,16 @@ def query_yes_no(question, default="yes"):
         raise ValueError("invalid default answer: '%s'" % default)
 
     while True:
-        sys.stdout.write(question + prompt)
+        print(question + prompt, end="")
         choice = input().lower()
         if default is not None and choice == "":
             return valid[default]
         elif choice in valid:
             return valid[choice]
         else:
-            sys.stdout.write("Please respond with 'yes' or 'no' " "(or 'y' or 'n').\n")
+            print("Please respond with 'yes' or 'no' " "(or 'y' or 'n').")
+
+
+def pprint(json, indent=2):
+    print(Json.dumps(json, indent=indent))
+    

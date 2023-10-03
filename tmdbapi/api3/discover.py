@@ -93,44 +93,41 @@ _DISCOVER_V3 = {
 
 
 class _Discover(Tmdb):
-
     def __init__(self, info_var):
         super().__init__()
-        self.base_path = "/discover"
+        self.category_path = "/discover"
         self.info_var = info_var
 
     def request(self) -> dict:
         url = self.build_url(3)
         return self.request_raw(
-            url = url,
+            url=url,
         )
-
-_discover = _Discover(_DISCOVER_V3)
 
 
 def movies(params: dict = {}, **kwargs) -> dict:
-    """Find movies using over 30 filters and sort options.
-    """
-    _discover.reset()
-    _discover.use("discover-movie")
+    """Find movies using over 30 filters and sort options."""
+    discover = _Discover(_DISCOVER_V3)
+    discover.reset()
+    discover.use("discover-movie")
     params.update(kwargs)
-    if not _discover.check_params(params):
+    if not discover.check_params(params):
         raise KeyError("The keyword in params is invalid")
-    _discover.load_query(params)
-    _discover.language(params.get("language", None))
-    _discover.region(params.get("region", None))
-    return _discover.request()
+    discover.load_query(params)
+    discover.language(params.get("language", None))
+    discover.region(params.get("region", None))
+    return discover.request()
 
 
 def tv(params: dict = {}, **kwargs) -> dict:
-    """Find TV shows using over 30 filters and sort options.
-    """
-    _discover.reset()
-    _discover.use("discover-tv")
+    """Find TV shows using over 30 filters and sort options."""
+    discover = _Discover(_DISCOVER_V3)
+    discover.reset()
+    discover.use("discover-tv")
     params.update(kwargs)
-    if not _discover.check_params(params):
+    if not discover.check_params(params):
         raise KeyError("params error")
-    _discover.load_query(params)
-    _discover.language(params.get("language", None))
-    _discover.region(params.get("region", None))
-    return _discover.request()
+    discover.load_query(params)
+    discover.language(params.get("language", None))
+    discover.region(params.get("region", None))
+    return discover.request()

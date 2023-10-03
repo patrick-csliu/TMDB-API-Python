@@ -20,31 +20,28 @@ _CERTIFICATION_V3 = {
 
 
 class _Certification(Tmdb):
-
     def __init__(self, info_var):
         super().__init__()
-        self.base_path = "/certification"
+        self.category_path = "/certification"
         self.info_var = info_var
 
     def request(self) -> dict:
         url = self.build_url(3)
         return self.request_raw(
-            url = url,
+            url=url,
         )
-
-_certification = _Certification(_CERTIFICATION_V3)
 
 
 def movie_list() -> dict:
-    """Get an up to date list of the officially supported movie certifications on TMDB.
-    """
-    _certification.reset()
-    _certification.use("certification-movie-list")
-    return _certification.request()
+    """Get an up to date list of the officially supported movie certifications on TMDB."""
+    certification = _Certification(_CERTIFICATION_V3)
+    certification.reset()
+    certification.use("certification-movie-list")
+    return certification.request()
 
 
 def tv_list() -> dict:
-
-    _certification.reset()
-    _certification.use("certifications-tv-list")
-    return _certification.request()
+    certification = _Certification(_CERTIFICATION_V3)
+    certification.reset()
+    certification.use("certifications-tv-list")
+    return certification.request()

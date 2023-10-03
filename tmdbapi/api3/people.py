@@ -87,135 +87,134 @@ _PEOPLE_V3 = {
 
 
 class _People(Tmdb):
-
     def __init__(self, info_var):
         super().__init__()
-        self.base_path = "/person"
+        self.category_path = "/person"
         self.info_var = info_var
 
     def request(self) -> dict:
         url = self.build_url(3)
         return self.request_raw(
-            url = url,
+            url=url,
         )
-
-_people = _People(_PEOPLE_V3)
 
 
 def popular(page=1, language: str = None) -> dict:
-    """Get a list of people ordered by popularity.
-    """
-    _people.reset()
-    _people.use("person-popular-list")
-    _people.language(language)
-    _people.load_query(page=page)
-    return _people.request()
+    """Get a list of people ordered by popularity."""
+    people = _People(_PEOPLE_V3)
+    people.reset()
+    people.use("person-popular-list")
+    people.language(language)
+    people.load_query(page=page)
+    return people.request()
 
 
-def details(person_id: int, append_to_response="videos,images",
-            language: str = None) -> dict:
-    """Query the top level details of a person.
-    """
-    _people.reset()
-    _people.use("person-details")
-    _people.load_path_arg(person_id=person_id)
-    _people.language(language)
-    _people.load_query(append_to_response=append_to_response)
-    return _people.request()
+def details(
+    person_id: int, append_to_response="videos,images", language: str = None
+) -> dict:
+    """Query the top level details of a person."""
+    people = _People(_PEOPLE_V3)
+    people.reset()
+    people.use("person-details")
+    people.load_path_arg(person_id=person_id)
+    people.language(language)
+    people.load_query(append_to_response=append_to_response)
+    return people.request()
 
 
-def changes(person_id: int, start_date="", end_date="",
-            page=1) -> dict:
+def changes(person_id: int, start_date="", end_date="", page=1) -> dict:
     """Get the recent changes for a person.
-    
+
     `start_date` and `start_date` is lte and gte
     Format: YYYY-MM-DD
     """
-    _people.reset()
-    _people.use("person-changes")
-    _people.load_path_arg(person_id=person_id)
+    people = _People(_PEOPLE_V3)
+    people.reset()
+    people.use("person-changes")
+    people.load_path_arg(person_id=person_id)
     if start_date != "":
         type_checking("date", start_date)
-        _people.load_query(start_date=start_date)
+        people.load_query(start_date=start_date)
     if end_date != "":
         type_checking("date", end_date)
-        _people.load_query(end_date=end_date)
-    _people.load_query(page=page)
-    return _people.request()
+        people.load_query(end_date=end_date)
+    people.load_query(page=page)
+    return people.request()
 
 
 def combined_credits(person_id: int, language: str = None) -> dict:
-    """Get the combined movie and TV credits that belong to a person.
-    """
-    _people.reset()
-    _people.use("person-combined-credits")
-    _people.load_path_arg(person_id=person_id)
-    _people.language(language)
-    return _people.request()
+    """Get the combined movie and TV credits that belong to a person."""
+    people = _People(_PEOPLE_V3)
+    people.reset()
+    people.use("person-combined-credits")
+    people.load_path_arg(person_id=person_id)
+    people.language(language)
+    return people.request()
 
 
 def external_ids(person_id: int) -> dict:
-    """Get the external ID's that belong to a person.
-    """
-    _people.reset()
-    _people.use("person-external-ids")
-    _people.load_path_arg(person_id=person_id)
-    return _people.request()
+    """Get the external ID's that belong to a person."""
+    people = _People(_PEOPLE_V3)
+    people.reset()
+    people.use("person-external-ids")
+    people.load_path_arg(person_id=person_id)
+    return people.request()
 
 
 def images(person_id: int) -> dict:
-    """Get the profile images that belong to a person.
-    """
-    _people.reset()
-    _people.use("person-images")
-    _people.load_path_arg(person_id=person_id)
-    return _people.request()
+    """Get the profile images that belong to a person."""
+    people = _People(_PEOPLE_V3)
+    people.reset()
+    people.use("person-images")
+    people.load_path_arg(person_id=person_id)
+    return people.request()
 
 
 def latest() -> dict:
-    """Get the newest created person. This is a live response and 
+    """Get the newest created person. This is a live response and
     will continuously change.
     """
-    _people.reset()
-    _people.use("person-latest-id")
-    return _people.request()
+    people = _People(_PEOPLE_V3)
+    people.reset()
+    people.use("person-latest-id")
+    return people.request()
 
 
 def movie_credits(person_id: int, language: str = None) -> dict:
-    """Get the movie credits for a person.
-    """
-    _people.reset()
-    _people.use("person-movie-credits")
-    _people.load_path_arg(person_id=person_id)
-    _people.language(language)
-    return _people.request()
+    """Get the movie credits for a person."""
+    people = _People(_PEOPLE_V3)
+    people.reset()
+    people.use("person-movie-credits")
+    people.load_path_arg(person_id=person_id)
+    people.language(language)
+    return people.request()
 
 
 def tv_credits(person_id: int, language: str = None) -> dict:
-    """Get the TV credits that belong to a person.
-    """
-    _people.reset()
-    _people.use("person-tv-credits")
-    _people.load_path_arg(person_id=person_id)
-    _people.language(language)
-    return _people.request()
+    """Get the TV credits that belong to a person."""
+    people = _People(_PEOPLE_V3)
+    people.reset()
+    people.use("person-tv-credits")
+    people.load_path_arg(person_id=person_id)
+    people.language(language)
+    return people.request()
 
 
 def tagged_images(person_id: int, page=1) -> dict:
-    """Get the tagged images for a person.
-    """
+    """Get the tagged images for a person."""
+    people = _People(_PEOPLE_V3)
     ServiceDeprecationWarning("people.tagged_images method is deprecated.")
-    _people.reset()
-    _people.use("person-tagged-images")
-    _people.load_path_arg(person_id=person_id)
-    _people.load_query(page=page)
-    return _people.request()
+    people.reset()
+    people.use("person-tagged-images")
+    people.load_path_arg(person_id=person_id)
+    people.load_query(page=page)
+    return people.request()
 
 
 def translations(person_id: int) -> dict:
-    """Get the translations that belong to a person.
-    """
-    _people.reset()
-    _people.use("translations")
-    _people.load_path_arg(person_id=person_id)
-    return _people.request()
+    """Get the translations that belong to a person."""
+    people = _People(_PEOPLE_V3)
+    people.reset()
+    people.use("translations")
+    people.load_path_arg(person_id=person_id)
+    return people.request()

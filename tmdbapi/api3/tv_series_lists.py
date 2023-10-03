@@ -44,66 +44,64 @@ _TV_SERIES_LISTS_V3 = {
 
 
 class _TvSeriesLists(Tmdb):
-
     def __init__(self, info_var):
         super().__init__()
-        self.base_path = "/tv"
+        self.category_path = "/tv"
         self.info_var = info_var
 
     def request(self) -> dict:
         url = self.build_url(3)
         return self.request_raw(
-            url = url,
+            url=url,
         )
 
-_tv_series_lists = _TvSeriesLists(_TV_SERIES_LISTS_V3)
 
-
-def airing_today(page=1, language: str = None,
-                 timezone: str = None) -> dict:
+def airing_today(page=1, language: str = None, timezone: str = None) -> dict:
     """Get a list of TV shows airing today.
 
     timezone:
     Get the list of timezones from configuration.timezones
     """
-    _tv_series_lists.reset()
-    _tv_series_lists.use("tv-series-airing-today-list")
-    _tv_series_lists.language(language)
-    _tv_series_lists.load_query(page=page)
+    tv_series_lists = _TvSeriesLists(_TV_SERIES_LISTS_V3)
+    tv_series_lists.reset()
+    tv_series_lists.use("tv-series-airing-today-list")
+    tv_series_lists.language(language)
+    tv_series_lists.load_query(page=page)
     if timezone is not None:
-        _tv_series_lists.load_query(timezone=timezone)
-    return _tv_series_lists.request()
+        tv_series_lists.load_query(timezone=timezone)
+    return tv_series_lists.request()
 
 
-def on_the_air(page=1, language: str = None,
-               timezone: str = None) -> dict:
+def on_the_air(page=1, language: str = None, timezone: str = None) -> dict:
     """Get a list of TV shows that air in the next 7 days.
-    
+
     timezone:
     Get the list of timezones from configuration.timezones
     """
-    _tv_series_lists.reset()
-    _tv_series_lists.use("tv-series-on-the-air-list")
-    _tv_series_lists.language(language)
-    _tv_series_lists.load_query(page=page)
+    tv_series_lists = _TvSeriesLists(_TV_SERIES_LISTS_V3)
+    tv_series_lists.reset()
+    tv_series_lists.use("tv-series-on-the-air-list")
+    tv_series_lists.language(language)
+    tv_series_lists.load_query(page=page)
     if timezone is not None:
-        _tv_series_lists.load_query(timezone=timezone)
-    return _tv_series_lists.request()
+        tv_series_lists.load_query(timezone=timezone)
+    return tv_series_lists.request()
 
 
 def popular(page=1, language: str = None) -> dict:
     """Get a list of TV shows ordered by popularity."""
-    _tv_series_lists.reset()
-    _tv_series_lists.use("tv-series-popular-list")
-    _tv_series_lists.language(language)
-    _tv_series_lists.load_query(page=page)
-    return _tv_series_lists.request()
+    tv_series_lists = _TvSeriesLists(_TV_SERIES_LISTS_V3)
+    tv_series_lists.reset()
+    tv_series_lists.use("tv-series-popular-list")
+    tv_series_lists.language(language)
+    tv_series_lists.load_query(page=page)
+    return tv_series_lists.request()
 
 
 def top_rated(page=1, language: str = None) -> dict:
-
-    _tv_series_lists.reset()
-    _tv_series_lists.use("tv-series-top-rated-list")
-    _tv_series_lists.language(language)
-    _tv_series_lists.load_query(page=page)
-    return _tv_series_lists.request()
+    tv_series_lists = _TvSeriesLists(_TV_SERIES_LISTS_V3)
+    tv_series_lists.reset()
+    tv_series_lists.use("tv-series-top-rated-list")
+    tv_series_lists.language(language)
+    tv_series_lists.load_query(page=page)
+    return tv_series_lists.request()

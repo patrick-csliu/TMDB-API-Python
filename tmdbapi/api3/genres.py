@@ -20,34 +20,31 @@ _GENRES_V3 = {
 
 
 class _Genres(Tmdb):
-
     def __init__(self, info_var):
         super().__init__()
-        self.base_path = "/genre"
+        self.category_path = "/genre"
         self.info_var = info_var
 
     def request(self) -> dict:
         url = self.build_url(3)
         return self.request_raw(
-            url = url,
+            url=url,
         )
-
-_genres = _Genres(_GENRES_V3)
 
 
 def movie_list(language: str = None) -> dict:
-    """Get the list of official genres for movies.
-    """
-    _genres.reset()
-    _genres.use("genre-movie-list")
-    _genres.language(language)
-    return _genres.request()
+    """Get the list of official genres for movies."""
+    genres = _Genres(_GENRES_V3)
+    genres.reset()
+    genres.use("genre-movie-list")
+    genres.language(language)
+    return genres.request()
 
 
 def tv_list(language: str = None) -> dict:
-    """Get the list of official genres for TV shows.
-    """
-    _genres.reset()
-    _genres.use("genre-tv-list")
-    _genres.language(language)
-    return _genres.request()
+    """Get the list of official genres for TV shows."""
+    genres = _Genres(_GENRES_V3)
+    genres.reset()
+    genres.use("genre-tv-list")
+    genres.language(language)
+    return genres.request()

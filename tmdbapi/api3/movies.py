@@ -154,43 +154,41 @@ _MOVIES_V3 = {
 
 
 class _Movies(Tmdb):
-
     def __init__(self, info_var):
         super().__init__()
-        self.base_path = "/movie"
+        self.category_path = "/movie"
         self.info_var = info_var
 
     def request(self) -> dict:
         url = self.build_url(3)
         return self.request_raw(
-            url = url,
+            url=url,
         )
 
-_movies = _Movies(_MOVIES_V3)
+
+def details(
+    movie_id: str,
+    append_to_response="videos,trailers,images,casts,translations,keywords,release_dates",
+    language: str = None,
+) -> dict:
+    """Get the top level details of a movie by ID."""
+    movies = _Movies(_MOVIES_V3)
+    movies.reset()
+    movies.use("movie-details")
+    movies.load_path_arg(movie_id=movie_id)
+    movies.language(language)
+    movies.load_query(append_to_response=append_to_response)
+    return movies.request()
 
 
-def details(movie_id: str,
-            append_to_response="videos,trailers,images,casts,translations,keywords,release_dates",
-            language: str = None) -> dict:
-    """Get the top level details of a movie by ID.
-    """
-    _movies.reset()
-    _movies.use("movie-details")
-    _movies.load_path_arg(movie_id=movie_id)
-    _movies.language(language)
-    _movies.load_query(append_to_response=append_to_response)
-    return _movies.request()
-
-
-def account_states(movie_id: str,
-                   guest_session_id: str = None) -> dict:
-    """Get the rating, watchlist and favorite status of an account.
-    """
-    _movies.reset()
-    _movies.use("movie-account-states")
-    _movies.load_path_arg(movie_id=movie_id)
-    _movies.choose_session_id(guest_session_id)
-    return _movies.request()
+def account_states(movie_id: str, guest_session_id: str = None) -> dict:
+    """Get the rating, watchlist and favorite status of an account."""
+    movies = _Movies(_MOVIES_V3)
+    movies.reset()
+    movies.use("movie-account-states")
+    movies.load_path_arg(movie_id=movie_id)
+    movies.choose_session_id(guest_session_id)
+    return movies.request()
 
 
 def alternative_titles(movie_id: str, country: str = None) -> dict:
@@ -198,183 +196,184 @@ def alternative_titles(movie_id: str, country: str = None) -> dict:
 
     country: format ISO-3166-1
     """
-    _movies.reset()
-    _movies.use("movie-alternative-titles")
-    _movies.load_path_arg(movie_id=movie_id)
-    _movies.load_query(country=country)
-    return _movies.request()
+    movies = _Movies(_MOVIES_V3)
+    movies.reset()
+    movies.use("movie-alternative-titles")
+    movies.load_path_arg(movie_id=movie_id)
+    movies.load_query(country=country)
+    return movies.request()
 
 
-def changes(movie_id: str, start_date="", end_date="",
-            page=1) -> dict:
+def changes(movie_id: str, start_date="", end_date="", page=1) -> dict:
     """Get the recent changes for a movie.
 
     `start_date` and `start_date` is lte and gte
     Format: YYYY-MM-DD
     """
-    _movies.reset()
-    _movies.use("movie-changes")
-    _movies.load_path_arg(movie_id=movie_id)
+    movies = _Movies(_MOVIES_V3)
+    movies.reset()
+    movies.use("movie-changes")
+    movies.load_path_arg(movie_id=movie_id)
     if start_date != "":
         type_checking("date", start_date)
-        _movies.load_query(start_date=start_date)
+        movies.load_query(start_date=start_date)
     if end_date != "":
         type_checking("date", end_date)
-        _movies.load_query(end_date=end_date)
-    _movies.load_query(page=page)
-    return _movies.request()
+        movies.load_query(end_date=end_date)
+    movies.load_query(page=page)
+    return movies.request()
 
 
 def credits(movie_id: str, language: str = None) -> dict:
-
-    _movies.reset()
-    _movies.use("movie-credits")
-    _movies.load_path_arg(movie_id=movie_id)
-    _movies.language(language)
-    return _movies.request()
+    movies = _Movies(_MOVIES_V3)
+    movies.reset()
+    movies.use("movie-credits")
+    movies.load_path_arg(movie_id=movie_id)
+    movies.language(language)
+    return movies.request()
 
 
 def external_ids(movie_id: str) -> dict:
+    movies = _Movies(_MOVIES_V3)
+    movies.reset()
+    movies.use("movie-external-ids")
+    movies.load_path_arg(movie_id=movie_id)
+    return movies.request()
 
-    _movies.reset()
-    _movies.use("movie-external-ids")
-    _movies.load_path_arg(movie_id=movie_id)
-    return _movies.request()
 
-
-def images(movie_id: str, include_image_language: str = None,
-           language: str = None) -> dict:
+def images(
+    movie_id: str, include_image_language: str = None, language: str = None
+) -> dict:
     """Get the images that belong to a movie.
 
     include_image_language:
-    specify a comma separated list of ISO-639-1 values to query, 
+    specify a comma separated list of ISO-639-1 values to query,
     for example: en,null
     """
-    _movies.reset()
-    _movies.use("movie-images")
-    _movies.load_path_arg(movie_id=movie_id)
-    _movies.language(language)
+    movies = _Movies(_MOVIES_V3)
+    movies.reset()
+    movies.use("movie-images")
+    movies.load_path_arg(movie_id=movie_id)
+    movies.language(language)
     if include_image_language is not None:
-        _movies.load_query(include_image_language=include_image_language)
-    return _movies.request()
+        movies.load_query(include_image_language=include_image_language)
+    return movies.request()
 
 
 def keywords(movie_id: str) -> dict:
-
-    _movies.reset()
-    _movies.use("movie-keywords")
-    _movies.load_path_arg(movie_id=movie_id)
-    return _movies.request()
+    movies = _Movies(_MOVIES_V3)
+    movies.reset()
+    movies.use("movie-keywords")
+    movies.load_path_arg(movie_id=movie_id)
+    return movies.request()
 
 
 def latest() -> dict:
-    """Get the newest movie ID.
-    """
-    _movies.reset()
-    _movies.use("movie-latest-id")
-    return _movies.request()
+    """Get the newest movie ID."""
+    movies = _Movies(_MOVIES_V3)
+    movies.reset()
+    movies.use("movie-latest-id")
+    return movies.request()
 
 
 def lists(movie_id: str, page=1, language: str = None) -> dict:
+    movies = _Movies(_MOVIES_V3)
+    movies.reset()
+    movies.use("movie-lists")
+    movies.load_path_arg(movie_id=movie_id)
+    movies.language(language)
+    movies.load_query(page=page)
+    return movies.request()
 
-    _movies.reset()
-    _movies.use("movie-lists")
-    _movies.load_path_arg(movie_id=movie_id)
-    _movies.language(language)
-    _movies.load_query(page=page)
-    return _movies.request()
 
-
-def recommendations(movie_id: str, page=1,
-                    language: str = None) -> dict:
-
-    _movies.reset()
-    _movies.use("movie-recommendations")
-    _movies.load_path_arg(movie_id=movie_id)
-    _movies.language(language)
-    _movies.load_query(page=page)
-    return _movies.request()
+def recommendations(movie_id: str, page=1, language: str = None) -> dict:
+    movies = _Movies(_MOVIES_V3)
+    movies.reset()
+    movies.use("movie-recommendations")
+    movies.load_path_arg(movie_id=movie_id)
+    movies.language(language)
+    movies.load_query(page=page)
+    return movies.request()
 
 
 def release_dates(movie_id: str) -> dict:
-    """Get the release dates and certifications for a movie.
-    """
-    _movies.reset()
-    _movies.use("movie-release-dates")
-    _movies.load_path_arg(movie_id=movie_id)
-    return _movies.request()
+    """Get the release dates and certifications for a movie."""
+    movies = _Movies(_MOVIES_V3)
+    movies.reset()
+    movies.use("movie-release-dates")
+    movies.load_path_arg(movie_id=movie_id)
+    return movies.request()
 
 
 def reviews(movie_id: str, page=1, language: str = None) -> dict:
-    """Get the user reviews for a movie.
-    """
-    _movies.reset()
-    _movies.use("movie-reviews")
-    _movies.load_path_arg(movie_id=movie_id)
-    _movies.language(language)
-    _movies.load_query(page=page)
-    return _movies.request()
+    """Get the user reviews for a movie."""
+    movies = _Movies(_MOVIES_V3)
+    movies.reset()
+    movies.use("movie-reviews")
+    movies.load_path_arg(movie_id=movie_id)
+    movies.language(language)
+    movies.load_query(page=page)
+    return movies.request()
 
 
 def similar(movie_id: str, page=1, language: str = None) -> dict:
-    """Get the similar movies based on genres and " "keywords.
-    """
-    _movies.reset()
-    _movies.use("movie-similar")
-    _movies.load_path_arg(movie_id=movie_id)
-    _movies.language(language)
-    _movies.load_query(page=page)
-    return _movies.request()
+    """Get the similar movies based on genres and " "keywords."""
+    movies = _Movies(_MOVIES_V3)
+    movies.reset()
+    movies.use("movie-similar")
+    movies.load_path_arg(movie_id=movie_id)
+    movies.language(language)
+    movies.load_query(page=page)
+    return movies.request()
 
 
 def translations(movie_id: str) -> dict:
-    """Get the translations for a movie.
-    """
-    _movies.reset()
-    _movies.use("movie-translations")
-    _movies.load_path_arg(movie_id=movie_id)
-    return _movies.request()
+    """Get the translations for a movie."""
+    movies = _Movies(_MOVIES_V3)
+    movies.reset()
+    movies.use("movie-translations")
+    movies.load_path_arg(movie_id=movie_id)
+    return movies.request()
 
 
 def videos(movie_id: str, language: str = None) -> dict:
-
-    _movies.reset()
-    _movies.use("movie-videos")
-    _movies.load_path_arg(movie_id=movie_id)
-    _movies.language(language)
-    return _movies.request()
+    movies = _Movies(_MOVIES_V3)
+    movies.reset()
+    movies.use("movie-videos")
+    movies.load_path_arg(movie_id=movie_id)
+    movies.language(language)
+    return movies.request()
 
 
 def watch_providers(movie_id: str) -> dict:
-    """Get the list of streaming providers we have for a movie.
-    """
-    _movies.reset()
-    _movies.use("movie-watch-providers")
-    _movies.load_path_arg(movie_id=movie_id)
-    return _movies.request()
+    """Get the list of streaming providers we have for a movie."""
+    movies = _Movies(_MOVIES_V3)
+    movies.reset()
+    movies.use("movie-watch-providers")
+    movies.load_path_arg(movie_id=movie_id)
+    return movies.request()
 
 
-def add_rating(movie_id: str, rating: int,
-               guest_session_id: str = None) -> dict:
+def add_rating(movie_id: str, rating: int, guest_session_id: str = None) -> dict:
     """Rate a movie and save it to your rated list.
-    
+
     rating: 0~10
     """
+    movies = _Movies(_MOVIES_V3)
     type_checking("rating", rating)
-    _movies.reset()
-    _movies.use("movie-add-rating")
-    _movies.load_path_arg(movie_id=movie_id)
-    _movies.choose_session_id(guest_session_id)
-    _movies.load_json({"value": rating})
-    return _movies.request()
+    movies.reset()
+    movies.use("movie-add-rating")
+    movies.load_path_arg(movie_id=movie_id)
+    movies.choose_session_id(guest_session_id)
+    movies.load_json({"value": rating})
+    return movies.request()
 
 
-def delete_rating(movie_id: str,
-                  guest_session_id: str = None) -> dict:
-    """Delete a user rating.
-    """
-    _movies.reset()
-    _movies.use("movie-delete-rating")
-    _movies.load_path_arg(movie_id=movie_id)
-    _movies.choose_session_id(guest_session_id)
-    return _movies.request()
+def delete_rating(movie_id: str, guest_session_id: str = None) -> dict:
+    """Delete a user rating."""
+    movies = _Movies(_MOVIES_V3)
+    movies.reset()
+    movies.use("movie-delete-rating")
+    movies.load_path_arg(movie_id=movie_id)
+    movies.choose_session_id(guest_session_id)
+    return movies.request()
