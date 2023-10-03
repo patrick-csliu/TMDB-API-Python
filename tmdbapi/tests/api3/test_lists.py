@@ -1,9 +1,9 @@
 import sys
 
+import pytest
+
 import tmdbapi
 from ..conftest import DataSharing
-
-import pytest
 
 
 def setup_module():

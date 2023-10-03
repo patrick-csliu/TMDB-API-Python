@@ -4,7 +4,8 @@
 
 
 from tmdbapi._core import Tmdb, settings
-from tmdbapi.credential import CREDENTIALS
+from tmdbapi import credential
+import tmdbapi
 
 
 _ACCOUNT_V4 = {
@@ -95,10 +96,13 @@ class _Account(Tmdb):
 
     def __init__(self, info_var):
         super().__init__()
-        self.base_path = "/4/account/{account_object_id}"
+        self.base_path = "/account/{account_object_id}"
         self.info_var = info_var
 
     def request(self) -> dict:
+        if credential.CREDENTIALS["access_token"] is None:
+            tmdbapi.LOGGER.error("No access_token.")
+            raise Exception("No access_token.")
         settings(use_access_token=True)
         url = self.build_url(4)
         return self.request_raw(
@@ -108,7 +112,7 @@ class _Account(Tmdb):
     def check_account_object_id(self):
         """Check whether `account_object_id` exists
         """
-        if CREDENTIALS["account_object_id"] is None:
+        if credential.CREDENTIALS["account_object_id"] is None:
             raise Exception("Need account_object_id")
         
     def get(self, use_name, page, language) -> dict:
@@ -117,7 +121,7 @@ class _Account(Tmdb):
         self.reset()
         self.use(use_name)
         self.check_account_object_id()
-        self.load_path_arg(account_object_id=CREDENTIALS["account_object_id"])
+        self.load_path_arg(account_object_id=credential.CREDENTIALS["account_object_id"])
         self.language(language)
         self.load_query(page=page)
         return self.request()
@@ -131,7 +135,7 @@ def lists(page=1) -> dict:
     _account.reset()
     _account.use("account-lists")
     _account.check_account_object_id()
-    _account.load_path_arg(account_object_id=CREDENTIALS["account_object_id"])
+    _account.load_path_arg(account_object_id=credential.CREDENTIALS["account_object_id"])
     _account.load_query(page=page)
     return _account.request()
 

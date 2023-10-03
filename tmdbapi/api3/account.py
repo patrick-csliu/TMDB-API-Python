@@ -2,7 +2,7 @@
 
 """
 
-from tmdbapi.credential import CREDENTIALS, set_credentials
+from tmdbapi import credential
 from tmdbapi._core import Tmdb
 from tmdbapi.exceptions import type_checking
 
@@ -146,7 +146,7 @@ class _Account(Tmdb):
         This method checks whether an `account_id` exists. If it doesn't, 
         it runs the 'details()' function to obtain the `account_id`.
         """
-        if CREDENTIALS["account_id"] is None:
+        if credential.CREDENTIALS["account_id"] is None:
             details()
 
 _account = _Account(_ACCOUNT_V3)
@@ -158,8 +158,8 @@ def details() -> dict:
     _account.use("account-details")
     json = _account.request()
     id = json['id']
-    if CREDENTIALS["account_id"] != id:
-        set_credentials(account_id=id)
+    if credential.CREDENTIALS["account_id"] != id:
+        credential.set_credentials(account_id=id)
     return json
 
 
@@ -169,7 +169,7 @@ def add_favorite(media_id: int, media_type: str, favorite=True) -> dict:
     _account.reset()
     _account.use("account-add-favorite")
     _account.check_account_id()
-    _account.load_path_arg(account_id=CREDENTIALS["account_id"])
+    _account.load_path_arg(account_id=credential.CREDENTIALS["account_id"])
     _account.load_json(
         {
             "media_type": media_type,
@@ -186,7 +186,7 @@ def add_to_watchlist(media_id: int, media_type: str, watchlist=True) -> dict:
     _account.reset()
     _account.use("account-add-to-watchlist")
     _account.check_account_id()
-    _account.load_path_arg(account_id=CREDENTIALS["account_id"])
+    _account.load_path_arg(account_id=credential.CREDENTIALS["account_id"])
     _account.load_json(
         {
             "media_type": media_type,
@@ -203,7 +203,7 @@ def favorite_movies(asc_sort=True, page=1,
     _account.reset()
     _account.use("account-get-favorites")
     _account.check_account_id()
-    _account.load_path_arg(account_id=CREDENTIALS["account_id"])
+    _account.load_path_arg(account_id=credential.CREDENTIALS["account_id"])
     _account.sortby(asc_sort)
     _account.language(language)
     _account.load_query(page=page)
@@ -216,7 +216,7 @@ def favorite_tv_shows(asc_sort=True, page=1,
     _account.reset()
     _account.use("account-favorite-tv")
     _account.check_account_id()
-    _account.load_path_arg(account_id=CREDENTIALS["account_id"])
+    _account.load_path_arg(account_id=credential.CREDENTIALS["account_id"])
     _account.sortby(asc_sort)
     _account.language(language)
     _account.load_query(page=page)
@@ -228,7 +228,7 @@ def get_list(page=1) -> dict:
     _account.reset()
     _account.use("account-lists")
     _account.check_account_id()
-    _account.load_path_arg(account_id=CREDENTIALS["account_id"])
+    _account.load_path_arg(account_id=credential.CREDENTIALS["account_id"])
     _account.load_query(page=page)
     return _account.request()
 
@@ -239,7 +239,7 @@ def rated_movies(asc_sort=True, page=1,
     _account.reset()
     _account.use("account-rated-movies")
     _account.check_account_id()
-    _account.load_path_arg(account_id=CREDENTIALS["account_id"])
+    _account.load_path_arg(account_id=credential.CREDENTIALS["account_id"])
     _account.sortby(asc_sort)
     _account.language(language)
     _account.load_query(page=page)
@@ -252,7 +252,7 @@ def rated_tv_shows(asc_sort=True, page=1,
     _account.reset()
     _account.use("account-rated-tv")
     _account.check_account_id()
-    _account.load_path_arg(account_id=CREDENTIALS["account_id"])
+    _account.load_path_arg(account_id=credential.CREDENTIALS["account_id"])
     _account.sortby(asc_sort)
     _account.language(language)
     _account.load_query(page=page)
@@ -265,7 +265,7 @@ def rated_tv_episodes(asc_sort=True, page=1,
     _account.reset()
     _account.use("account-rated-tv-episodes")
     _account.check_account_id()
-    _account.load_path_arg(account_id=CREDENTIALS["account_id"])
+    _account.load_path_arg(account_id=credential.CREDENTIALS["account_id"])
     _account.sortby(asc_sort)
     _account.language(language)
     _account.load_query(page=page)
@@ -278,7 +278,7 @@ def movie_watchlist(asc_sort=True, page=1,
     _account.reset()
     _account.use("account-watchlist-movies")
     _account.check_account_id()
-    _account.load_path_arg(account_id=CREDENTIALS["account_id"])
+    _account.load_path_arg(account_id=credential.CREDENTIALS["account_id"])
     _account.sortby(asc_sort)
     _account.language(language)
     _account.load_query(page=page)
@@ -291,7 +291,7 @@ def tv_show_watchlist(asc_sort=True, page=1,
     _account.reset()
     _account.use("account-watchlist-tv")
     _account.check_account_id()
-    _account.load_path_arg(account_id=CREDENTIALS["account_id"])
+    _account.load_path_arg(account_id=credential.CREDENTIALS["account_id"])
     _account.sortby(asc_sort)
     _account.language(language)
     _account.load_query(page=page)
