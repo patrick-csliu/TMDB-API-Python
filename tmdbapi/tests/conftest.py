@@ -22,6 +22,7 @@ def pytest_configure():
     Path("tmdbapi/tests/temp").mkdir(parents=True, exist_ok=True)
     shutil.copyfile("test.credential", "tmdbapi/tests/temp/test.credential")
 
+
 def pytest_unconfigure():
     shutil.rmtree("tmdbapi/tests/temp", ignore_errors=True)
 

@@ -6,11 +6,14 @@ import tmdbapi
 
 
 def setup_module():
-    loaded_package_modules = [key for key, value in sys.modules.items() if "tmdbapi" in str(value)]
+    loaded_package_modules = [
+        key for key, value in sys.modules.items() if "tmdbapi" in str(value)
+    ]
     for key in loaded_package_modules:
         del sys.modules[key]
     global tmdbapi  # reach the global scope
     import tmdbapi  # reimport package every before test
+
     cred = tmdbapi.Credential()
     cred.load("tmdbapi/tests/temp/test.credential")
     tmdbapi.setting.use_cred(cred)
@@ -25,7 +28,7 @@ def setup_module():
 
 
 MOVIE = [278, "movie"]  # [media_id, media_type]
-TV = [1396, "tv"]             # [media_id, media_type]
+TV = [1396, "tv"]  # [media_id, media_type]
 LANGUAGE = "zh-TW"
 
 
@@ -34,7 +37,6 @@ def test_details():
 
 
 class TestFavorite:
-    
     def test_add_movie(self):
         print(tmdbapi.api3.account.add_favorite(MOVIE[0], MOVIE[1]))
 
@@ -43,7 +45,7 @@ class TestFavorite:
 
     def test_get_movie(self):
         print(tmdbapi.api3.account.favorite_movies(asc_sort=False, language=LANGUAGE))
-    
+
     def test_get_tv(self):
         print(tmdbapi.api3.account.favorite_tv_shows(asc_sort=False, language=LANGUAGE))
 
@@ -55,7 +57,6 @@ class TestFavorite:
 
 
 class TestWatchlist:
-
     def test_add_movie(self):
         print(tmdbapi.api3.account.add_to_watchlist(MOVIE[0], MOVIE[1]))
 
@@ -64,7 +65,7 @@ class TestWatchlist:
 
     def test_get_movie(self):
         print(tmdbapi.api3.account.movie_watchlist(asc_sort=False, language=LANGUAGE))
-    
+
     def test_get_tv(self):
         print(tmdbapi.api3.account.tv_show_watchlist(asc_sort=False, language=LANGUAGE))
 

@@ -6,28 +6,33 @@ import tmdbapi
 
 
 def setup_module():
-    loaded_package_modules = [key for key, value in sys.modules.items() if "tmdbapi" in str(value)]
+    loaded_package_modules = [
+        key for key, value in sys.modules.items() if "tmdbapi" in str(value)
+    ]
     for key in loaded_package_modules:
         del sys.modules[key]
     global tmdbapi  # reach the global scope
     import tmdbapi  # reimport package every before test
-    tmdbapi.load_credentials("tmdbapi/tests/temp/test.credential")
+
+    cred = tmdbapi.Credential()
+    cred.load("tmdbapi/tests/temp/test.credential")
+    tmdbapi.setting.use_cred(cred)
 
 
 SERIES_ID = 1416
-LANGUAGE = 'en_US'
+LANGUAGE = "en_US"
 
 
 def test_account_states():
     tmdbapi.api3.tv_series.account_states(SERIES_ID)
 
 
-@pytest.mark.dependency(name='add_rate', scope='module')
+@pytest.mark.dependency(name="add_rate", scope="module")
 def test_add_rating():
     tmdbapi.api3.tv_series.add_rating(SERIES_ID, 3)
 
 
-@pytest.mark.dependency(depends=["add_rate"], scope='module')
+@pytest.mark.dependency(depends=["add_rate"], scope="module")
 def test_delete_rating():
     tmdbapi.api3.tv_series.delete_rating(SERIES_ID)
 
@@ -65,7 +70,7 @@ def test_external_ids():
 
 
 def test_images():
-    tmdbapi.api3.tv_series.images(SERIES_ID, include_image_language='zh')
+    tmdbapi.api3.tv_series.images(SERIES_ID, include_image_language="zh")
 
 
 def test_keywords():

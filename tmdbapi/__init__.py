@@ -7,7 +7,9 @@ import importlib as _importlib
 import logging as _logging
 
 LOGGER = _logging.getLogger("TMDB")
-LOG_FORMATTER = _logging.Formatter("%(asctime)s [%(name)s] [%(levelname)s] - %(message)s")
+LOG_FORMATTER = _logging.Formatter(
+    "%(asctime)s [%(name)s] [%(levelname)s] - %(message)s"
+)
 if not any(isinstance(x, _logging.StreamHandler) for x in LOGGER.handlers):
     _ch1 = _logging.StreamHandler()
     _ch1.setFormatter(LOG_FORMATTER)
@@ -16,6 +18,7 @@ if not any(isinstance(x, _logging.StreamHandler) for x in LOGGER.handlers):
 
 
 from ._core import Setting as _Setting, pprint
+
 setting = _Setting()
 
 
@@ -26,12 +29,11 @@ _submodules = ["api3", "api4", "tests", "cred", "exceptions"]
 __all__ = _submodules + ["Setting", "Credential"]
 
 
-_SESSION = None # requests.Session
+_SESSION = None  # requests.Session
+
 
 def __getattr__(name):
     if name in _submodules:
         return _importlib.import_module(f"tmdbapi.{name}")
     else:
-        raise AttributeError(
-            f'Package "tmdbapi" has no attribute "{name}"'
-        )
+        raise AttributeError(f'Package "tmdbapi" has no attribute "{name}"')

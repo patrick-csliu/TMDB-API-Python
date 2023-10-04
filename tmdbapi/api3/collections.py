@@ -67,7 +67,8 @@ def images(collection_id: int, language: str = None, include_image_language="") 
 
 
 def translations(collection_id: int) -> dict:
-    _collection.reset()
-    _collection.use("collection-translations")
-    _collection.load_path_arg(collection_id=collection_id)
-    return _collection.request()
+    collection = _Collection(_COLLECTION_V3)
+    collection.reset()
+    collection.use("collection-translations")
+    collection.load_path_arg(collection_id=collection_id)
+    return collection.request()
