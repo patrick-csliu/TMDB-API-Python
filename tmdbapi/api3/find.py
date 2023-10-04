@@ -20,26 +20,22 @@ _FIND_V3 = {
 
 
 class _Find(Tmdb):
-
     def __init__(self, info_var):
         super().__init__()
-        self.base_path = "/find"
+        self.category_path = "/find"
         self.info_var = info_var
 
     def request(self) -> dict:
         url = self.build_url(3)
         return self.request_raw(
-            url = url,
+            url=url,
         )
 
-_find = _Find(_FIND_V3)
 
-
-def find(external_id: str, external_source: str,
-         language: str = None) -> dict:
+def find(external_id: str, external_source: str, language: str = None) -> dict:
     """Find data by external ID's.
 
-    external_source 
+    external_source
 
 
     Parameters
@@ -59,10 +55,11 @@ def find(external_id: str, external_source: str,
         ```
     language : str, optional
     """
+    find = _Find(_FIND_V3)
     type_checking("external_source", external_source)
-    _find.reset()
-    _find.use("find-by-id")
-    _find.load_path_arg(external_id=external_id)
-    _find.language(language)
-    _find.load_query(external_source=external_source)
-    return _find.request()
+    find.reset()
+    find.use("find-by-id")
+    find.load_path_arg(external_id=external_id)
+    find.language(language)
+    find.load_query(external_source=external_source)
+    return find.request()

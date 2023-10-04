@@ -2,8 +2,9 @@
 
 """
 
-from tmdbapi._core import Tmdb, settings
+from tmdbapi._core import Tmdb
 from tmdbapi.exceptions import type_checking
+import tmdbapi
 
 _LISTS_V4 = {
     "list-add-items": {
@@ -68,29 +69,26 @@ _LISTS_V4 = {
 
 
 class _Lists(Tmdb):
-
     def __init__(self, info_var):
         super().__init__()
-        self.base_path = "/list"
+        self.category_path = "/list"
         self.info_var = info_var
 
     def request(self) -> dict:
-        settings(use_access_token=True)
+        tmdbapi.setting.set(use_access_token=True)
         url = self.build_url(4)
         return self.request_raw(
-            url = url,
+            url=url,
         )
-
-_lists = _Lists(_LISTS_V4)
 
 
 def details(list_id: int) -> dict:
-    """Retrieve a list by id.
-    """
-    _lists.reset()
-    _lists.use("list-details")
-    _lists.load_path_arg(list_id=list_id)
-    return _lists.request()
+    """Retrieve a list by id."""
+    lists = _Lists(_LISTS_V4)
+    lists.reset()
+    lists.use("list-details")
+    lists.load_path_arg(list_id=list_id)
+    return lists.request()
 
 
 def add_items(list_id: int, items: list) -> dict:
@@ -102,7 +100,7 @@ def add_items(list_id: int, items: list) -> dict:
         The ID of the list.
     items : list
         A list of items to add. It supports three types of list items:
-        Some items may not have comments. For tuples and lists, their length 
+        Some items may not have comments. For tuples and lists, their length
         can be 2, while for dictionaries, the 'comment' key may be absent.
 
         1.
@@ -142,25 +140,31 @@ def add_items(list_id: int, items: list) -> dict:
     dict
         The response from the API.
     """
-    _lists.reset()
-    _lists.use("list-add-items")
-    _lists.load_path_arg(list_id=list_id)
-    _lists.load_json(_pack_items(items))
-    return _lists.request()
+    lists = _Lists(_LISTS_V4)
+    lists.reset()
+    lists.use("list-add-items")
+    lists.load_path_arg(list_id=list_id)
+    lists.load_json(_pack_items(items))
+    return lists.request()
 
 
 def clear(list_id: int) -> dict:
-    """Clear all of the items on a list.
-    """
-    _lists.reset()
-    _lists.use("list-clear")
-    _lists.load_path_arg(list_id=list_id)
-    return _lists.request()
+    """Clear all of the items on a list."""
+    lists = _Lists(_LISTS_V4)
+    lists.reset()
+    lists.use("list-clear")
+    lists.load_path_arg(list_id=list_id)
+    return lists.request()
 
 
-def create(name: str, description="", public=False,
-           sort_by="original_order.asc", language: str = None,
-           country: str = None) -> dict:
+def create(
+    name: str,
+    description="",
+    public=False,
+    sort_by="original_order.asc",
+    language: str = None,
+    country: str = None,
+) -> dict:
     """Create a new list.
 
     Parameters
@@ -194,44 +198,44 @@ def create(name: str, description="", public=False,
     dict
         return from api
     """
+    lists = _Lists(_LISTS_V4)
     type_checking("list_sort_by", sort_by)
-    _lists.reset()
-    _lists.use("list-create")
+    lists.reset()
+    lists.use("list-create")
     payload = {
-            "description": description,
-            "name": name,
-            "iso_3166_1": "US",
-            "iso_639_1": "en",
-            "public": public,
-            "sort_by": sort_by
-        }
+        "description": description,
+        "name": name,
+        "iso_3166_1": "US",
+        "iso_639_1": "en",
+        "public": public,
+        "sort_by": sort_by,
+    }
     if language is not None:
         payload["iso_639_1"] = language
     if country is not None:
         payload["iso_3166_1"] = country
-    _lists.load_json(payload)
-    return _lists.request()
+    lists.load_json(payload)
+    return lists.request()
 
 
 def delete(list_id: int) -> dict:
-    """Delete a list.
-    """
-    _lists.reset()
-    _lists.use("list-delete")
-    _lists.load_path_arg(list_id=list_id)
-    return _lists.request()
+    """Delete a list."""
+    lists = _Lists(_LISTS_V4)
+    lists.reset()
+    lists.use("list-delete")
+    lists.load_path_arg(list_id=list_id)
+    return lists.request()
 
 
-def item_status(list_id: int, media_id: int,
-                media_type: str) -> dict:
-    """Check if an item is on a list.
-    """
+def item_status(list_id: int, media_id: int, media_type: str) -> dict:
+    """Check if an item is on a list."""
+    lists = _Lists(_LISTS_V4)
     type_checking("media_type", media_type)
-    _lists.reset()
-    _lists.use("list-item-status")
-    _lists.load_path_arg(list_id=list_id)
-    _lists.load_query(media_id=media_id, media_type=media_type)
-    return _lists.request()
+    lists.reset()
+    lists.use("list-item-status")
+    lists.load_path_arg(list_id=list_id)
+    lists.load_query(media_id=media_id, media_type=media_type)
+    return lists.request()
 
 
 def remove_items(list_id: int, items: list) -> dict:
@@ -279,16 +283,23 @@ def remove_items(list_id: int, items: list) -> dict:
     dict
         return from api
     """
-    _lists.reset()
-    _lists.use("list-remove-items")
-    _lists.load_path_arg(list_id=list_id)
-    _lists.load_json(_pack_items(items))
-    return _lists.request()
+    lists = _Lists(_LISTS_V4)
+    lists.reset()
+    lists.use("list-remove-items")
+    lists.load_path_arg(list_id=list_id)
+    lists.load_json(_pack_items(items))
+    return lists.request()
 
 
-def update(list_id: int, name: str = None, description: str = None,
-           public: bool = None, sort_by: str = None,
-           language: str = None, country: str = None) -> dict:
+def update(
+    list_id: int,
+    name: str = None,
+    description: str = None,
+    public: bool = None,
+    sort_by: str = None,
+    language: str = None,
+    country: str = None,
+) -> dict:
     """Update the details of a list.
 
     Parameters
@@ -324,10 +335,11 @@ def update(list_id: int, name: str = None, description: str = None,
     dict
         return from api
     """
+    lists = _Lists(_LISTS_V4)
     type_checking("list_sort_by", sort_by)
-    _lists.reset()
-    _lists.use("list-update")
-    _lists.load_path_arg(list_id=list_id)
+    lists.reset()
+    lists.use("list-update")
+    lists.load_path_arg(list_id=list_id)
     payload = {}
     if language is not None:
         payload["iso_639_1"] = language
@@ -341,8 +353,8 @@ def update(list_id: int, name: str = None, description: str = None,
         payload["public"] = public
     if sort_by is not None:
         payload["sort_by"] = sort_by
-    _lists.load_json(payload)
-    return _lists.request()
+    lists.load_json(payload)
+    return lists.request()
 
 
 def update_items(list_id: int, items: list) -> dict:
@@ -354,9 +366,9 @@ def update_items(list_id: int, items: list) -> dict:
         The list id.
     items : list
         Support three types of list.
-        There might be no comments for items; therefore, for tuples 
-        and lists, the length could be 2, and for dictionaries, the 
-        'comment' key might not be present. 
+        There might be no comments for items; therefore, for tuples
+        and lists, the length could be 2, and for dictionaries, the
+        'comment' key might not be present.
 
         1.
         ```
@@ -395,11 +407,12 @@ def update_items(list_id: int, items: list) -> dict:
     dict
         return from api
     """
-    _lists.reset()
-    _lists.use("list-update-items")
-    _lists.load_path_arg(list_id=list_id)
-    _lists.load_json(_pack_items(items))
-    return _lists.request()
+    lists = _Lists(_LISTS_V4)
+    lists.reset()
+    lists.use("list-update-items")
+    lists.load_path_arg(list_id=list_id)
+    lists.load_json(_pack_items(items))
+    return lists.request()
 
 
 def _pack_items(items: list) -> dict:
@@ -409,7 +422,7 @@ def _pack_items(items: list) -> dict:
     ----------
     items : list
         A list of items to add. It supports three types of list items:
-        Some items may not have comments. For tuples and lists, their length 
+        Some items may not have comments. For tuples and lists, their length
         can be 2, while for dictionaries, the 'comment' key may be absent.
 
         1.
@@ -465,27 +478,32 @@ def _pack_items(items: list) -> dict:
         }
         ```
     """
+
     def _pack_items_list(items: list[list] | list[tuple]) -> dict:
         packed_items = []
         for item in items:
             if len(item) == 2:
-                packed_items.append({
-                    "media_type": item[0],
-                    "media_id": item[1],
-                    })
+                packed_items.append(
+                    {
+                        "media_type": item[0],
+                        "media_id": item[1],
+                    }
+                )
             elif len(item) == 3:
-                packed_items.append({
-                    "media_type": item[0],
-                    "media_id": item[1],
-                    "comment": item[2],
-                    })
+                packed_items.append(
+                    {
+                        "media_type": item[0],
+                        "media_id": item[1],
+                        "comment": item[2],
+                    }
+                )
             else:
                 raise Exception("items error")
         return {"items": packed_items}
 
     def _pack_items_dict(items: list[dict]) -> dict:
         return {"items": items}
-    
+
     if items:
         if isinstance(items[0], (list, tuple)):
             return _pack_items_list(items)

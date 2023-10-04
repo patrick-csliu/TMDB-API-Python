@@ -15,25 +15,22 @@ _CREDITS_V3 = {
 
 
 class _Credits(Tmdb):
-
     def __init__(self, info_var):
         super().__init__()
-        self.base_path = "/credit"
+        self.category_path = "/credit"
         self.info_var = info_var
 
     def request(self) -> dict:
         url = self.build_url(3)
         return self.request_raw(
-            url = url,
+            url=url,
         )
-
-_credits = _Credits(_CREDITS_V3)
 
 
 def details(credit_id: str) -> dict:
-    """Get a movie or TV credit details by ID.
-    """
-    _credits.reset()
-    _credits.use("credit-details")
-    _credits.load_path_arg(credit_id=credit_id)
-    return _credits.request()
+    """Get a movie or TV credit details by ID."""
+    credits = _Credits(_CREDITS_V3)
+    credits.reset()
+    credits.use("credit-details")
+    credits.load_path_arg(credit_id=credit_id)
+    return credits.request()

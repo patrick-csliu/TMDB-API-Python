@@ -70,96 +70,87 @@ _LISTS_V3 = {
 
 
 class _Lists(Tmdb):
-
     def __init__(self, info_var):
         super().__init__()
-        self.base_path = "/list"
+        self.category_path = "/list"
         self.info_var = info_var
 
     def request(self) -> dict:
         url = self.build_url(3)
         return self.request_raw(
-            url = url,
+            url=url,
         )
-
-_lists = _Lists(_LISTS_V3)
 
 
 def add_movie(list_id: int, movie_id: int) -> dict:
-    """Add a movie to a list.
-    """
-    _lists.reset()
-    _lists.use("list-add-movie")
-    _lists.load_path_arg(list_id=list_id)
-    _lists.load_query(_lists.check_token())
-    _lists.load_json({"media_id": movie_id})
-    return _lists.request()
+    """Add a movie to a list."""
+    lists = _Lists(_LISTS_V3)
+    lists.reset()
+    lists.use("list-add-movie")
+    lists.load_path_arg(list_id=list_id)
+    lists.load_query(lists.check_token())
+    lists.load_json({"media_id": movie_id})
+    return lists.request()
 
 
-def check_item_status(list_id: int, movie_id: int,
-                      language: str = None) -> dict:
-    """Use this method to check if an item has already been added 
+def check_item_status(list_id: int, movie_id: int, language: str = None) -> dict:
+    """Use this method to check if an item has already been added
     to the list.
     """
-    _lists.reset()
-    _lists.use("list-check-item-status")
-    _lists.load_path_arg(list_id=list_id)
-    _lists.language(language)
-    _lists.load_query(movie_id=movie_id)
-    return _lists.request()
+    lists = _Lists(_LISTS_V3)
+    lists.reset()
+    lists.use("list-check-item-status")
+    lists.load_path_arg(list_id=list_id)
+    lists.language(language)
+    lists.load_query(movie_id=movie_id)
+    return lists.request()
 
 
 def clear(list_id: int) -> dict:
-    """Clear all items from a list.
-    """
-    _lists.reset()
-    _lists.use("list-clear")
-    _lists.load_path_arg(list_id=list_id)
-    _lists.load_query(_lists.check_token())
-    _lists.load_query(confirm=True)
-    return _lists.request()
+    """Clear all items from a list."""
+    lists = _Lists(_LISTS_V3)
+    lists.reset()
+    lists.use("list-clear")
+    lists.load_path_arg(list_id=list_id)
+    lists.load_query(lists.check_token())
+    lists.load_query(confirm=True)
+    return lists.request()
 
 
-def create(name: str, description: str, language='en') -> dict:
-
-    _lists.reset()
-    _lists.use("list-create")
-    _lists.load_query(_lists.check_token())
-    _lists.load_json(
-        {
-            "name": name,
-            "description": description,
-            "language": language
-        }
-    )
-    return _lists.request()
+def create(name: str, description: str, language="en") -> dict:
+    lists = _Lists(_LISTS_V3)
+    lists.reset()
+    lists.use("list-create")
+    lists.load_query(lists.check_token())
+    lists.load_json({"name": name, "description": description, "language": language})
+    return lists.request()
 
 
 def delete(list_id: int) -> dict:
-    """Delete a list.
-    """
-    _lists.reset()
-    _lists.use("list-delete")
-    _lists.load_path_arg(list_id=list_id)
-    _lists.load_query(_lists.check_token())
-    return _lists.request()
+    """Delete a list."""
+    lists = _Lists(_LISTS_V3)
+    lists.reset()
+    lists.use("list-delete")
+    lists.load_path_arg(list_id=list_id)
+    lists.load_query(lists.check_token())
+    return lists.request()
 
 
 def details(list_id: int, language: str = None) -> dict:
-
-    _lists.reset()
-    _lists.use("list-details")
-    _lists.load_path_arg(list_id=list_id)
-    _lists.language(language)
-    return _lists.request()
+    lists = _Lists(_LISTS_V3)
+    lists.reset()
+    lists.use("list-details")
+    lists.load_path_arg(list_id=list_id)
+    lists.language(language)
+    return lists.request()
 
 
 def remove_movie(list_id: int, movie_id: int) -> dict:
-    """Remove a movie from a list.
-    """
-    _lists.reset()
-    _lists.use("list-remove-movie")
-    _lists.load_path_arg(list_id=list_id)
-    _lists.load_query(_lists.check_token())
-    _lists.load_json({"media_id": movie_id})
-    return _lists.request()
+    """Remove a movie from a list."""
+    lists = _Lists(_LISTS_V3)
+    lists.reset()
+    lists.use("list-remove-movie")
+    lists.load_path_arg(list_id=list_id)
+    lists.load_query(lists.check_token())
+    lists.load_json({"media_id": movie_id})
+    return lists.request()

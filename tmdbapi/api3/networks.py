@@ -31,7 +31,7 @@ class _Networks(Tmdb):
 
     def __init__(self, info_var):
         super().__init__()
-        self.base_path = "/network"
+        self.category_path = "/network"
         self.info_var = info_var
 
     def request(self) -> dict:
@@ -40,30 +40,30 @@ class _Networks(Tmdb):
             url = url,
         )
 
-_networks = _Networks(_NETWORKS_V3)
-
 
 def details(network_id: int) -> dict:
-
-    _networks.reset()
-    _networks.use("network-details")
-    _networks.load_path_arg(network_id=network_id)
-    return _networks.request()
+    networks = _Networks(_NETWORKS_V3)
+    networks.reset()
+    networks.use("network-details")
+    networks.load_path_arg(network_id=network_id)
+    return networks.request()
 
 
 def alternative_names(network_id: int) -> dict:
     """Get the alternative names of a network.
     """
-    _networks.reset()
-    _networks.use("details-copy")
-    _networks.load_path_arg(network_id=network_id)
-    return _networks.request()
+    networks = _Networks(_NETWORKS_V3)
+    networks.reset()
+    networks.use("details-copy")
+    networks.load_path_arg(network_id=network_id)
+    return networks.request()
 
 
 def images(network_id: int) -> dict:
     """Get the TV network logos by id.
     """
-    _networks.reset()
-    _networks.use("alternative-names-copy")
-    _networks.load_path_arg(network_id=network_id)
-    return _networks.request()
+    networks = _Networks(_NETWORKS_V3)
+    networks.reset()
+    networks.use("alternative-names-copy")
+    networks.load_path_arg(network_id=network_id)
+    return networks.request()

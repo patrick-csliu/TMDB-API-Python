@@ -4,18 +4,23 @@ import tmdbapi
 
 
 def setup_module():
-    loaded_package_modules = [key for key, value in sys.modules.items() if "tmdbapi" in str(value)]
+    loaded_package_modules = [
+        key for key, value in sys.modules.items() if "tmdbapi" in str(value)
+    ]
     for key in loaded_package_modules:
         del sys.modules[key]
     global tmdbapi  # reach the global scope
     import tmdbapi  # reimport package every before test
-    tmdbapi.load_credentials("tmdbapi/tests/temp/test.credential")
 
-LANGUAGE = 'en-US'
+    cred = tmdbapi.Credential()
+    cred.load("tmdbapi/tests/temp/test.credential")
+    tmdbapi.setting.use_cred(cred)
+
+
+LANGUAGE = "en-US"
 
 
 def test_favorite_movies():
-    print(tmdbapi.credential.CREDENTIALS)
     tmdbapi.api4.account.favorite_movies(language=LANGUAGE)
 
 

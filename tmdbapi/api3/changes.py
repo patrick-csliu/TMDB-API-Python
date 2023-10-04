@@ -38,22 +38,19 @@ _CHANGES_V3 = {
 
 
 class _Changes(Tmdb):
-
     def __init__(self, info_var):
         super().__init__()
-        self.base_path = ""
+        self.category_path = ""
         self.info_var = info_var
 
     def request(self) -> dict:
         url = self.build_url(3)
         return self.request_raw(
-            url = url,
+            url=url,
         )
 
-    def change_list(self, use_name, start_date="", end_date="",
-                    page=1) -> dict:
-        """Wrap the same process for get th change list
-        """
+    def change_list(self, use_name, start_date="", end_date="", page=1) -> dict:
+        """Wrap the same process for get th change list"""
         self.reset()
         self.use(use_name)
         if start_date != "":
@@ -65,38 +62,39 @@ class _Changes(Tmdb):
         self.load_query(page=page)
         return self.request()
 
-_changes = _Changes(_CHANGES_V3)
-
 
 def movie_list(start_date="", end_date="", page=1) -> dict:
-    """Get a list of all of the movie ids that have been 
+    """Get a list of all of the movie ids that have been
     changed in the past 24 hours.
 
     `start_date` and `start_date` is lte and gte
     Format: YYYY-MM-DD
     """
-    return _changes.change_list("changes-movie-list",
-                                start_date=start_date,
-                                end_date=end_date, page=page)
+    changes = _Changes(_CHANGES_V3)
+    return changes.change_list(
+        "changes-movie-list", start_date=start_date, end_date=end_date, page=page
+    )
 
 
 def tv_list(start_date="", end_date="", page=1) -> dict:
     """
-    
+
     `start_date` and `start_date` is lte and gte
     Format: YYYY-MM-DD
     """
-    return _changes.change_list("changes-tv-list",
-                                start_date=start_date,
-                                end_date=end_date, page=page)
+    changes = _Changes(_CHANGES_V3)
+    return changes.change_list(
+        "changes-tv-list", start_date=start_date, end_date=end_date, page=page
+    )
 
 
 def person_list(start_date="", end_date="", page=1) -> dict:
     """
-    
+
     `start_date` and `start_date` is lte and gte
     Format: YYYY-MM-DD
     """
-    return _changes.change_list("changes-people-list",
-                                start_date=start_date,
-                                end_date=end_date, page=page)
+    changes = _Changes(_CHANGES_V3)
+    return changes.change_list(
+        "changes-people-list", start_date=start_date, end_date=end_date, page=page
+    )

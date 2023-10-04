@@ -9,8 +9,10 @@
 #         del sys.modules[key]
 #     global tmdbapi  # reach the global scope
 #     import tmdbapi  # reimport package every before test
-#     tmdbapi.load_credentials("tmdbapi/tests/temp/test.credential")
-
+#
+#     cred = tmdbapi.Credential()
+#     cred.load("tmdbapi/tests/temp/test.credential")
+#     tmdbapi.setting.use_cred(cred)
 
 
 # def test_create_guest_session():

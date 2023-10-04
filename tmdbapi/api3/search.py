@@ -79,112 +79,120 @@ _SEARCH_V3 = {
 
 
 class _Search(Tmdb):
-
     def __init__(self, info_var):
         super().__init__()
-        self.base_path = "/search"
+        self.category_path = "/search"
         self.info_var = info_var
 
     def request(self) -> dict:
         url = self.build_url(3)
         return self.request_raw(
-            url = url,
+            url=url,
         )
 
-_search = _Search(_SEARCH_V3)
 
-
-def collections(query: str, include_adult=False, page=1,
-                language: str = None, region: str = None) -> dict:
-    """Search for collections by their original, translated and 
+def collections(
+    query: str, include_adult=False, page=1, language: str = None, region: str = None
+) -> dict:
+    """Search for collections by their original, translated and
     alternative names.
     """
-    _search.reset()
-    _search.use("search-collection")
-    _search.language(language)
-    _search.region(region)
-    _search.load_query({"query": query}, include_adult=include_adult, page=page)
-    return _search.request()
+    search = _Search(_SEARCH_V3)
+    search.reset()
+    search.use("search-collection")
+    search.language(language)
+    search.region(region)
+    search.load_query({"query": query}, include_adult=include_adult, page=page)
+    return search.request()
 
 
 def companies(query: str, page=1) -> dict:
-    """Search for companies by their original and alternative names.
-    """
-    _search.reset()
-    _search.use("search-company")
-    _search.load_query({"query": query}, page=page)
-    return _search.request()
+    """Search for companies by their original and alternative names."""
+    search = _Search(_SEARCH_V3)
+    search.reset()
+    search.use("search-company")
+    search.load_query({"query": query}, page=page)
+    return search.request()
 
 
 def keywords(query: str, page=1) -> dict:
-    """Search for keywords by their name.
-    """
-    _search.reset()
-    _search.use("search-keyword")
-    _search.load_query({"query": query}, page=page)
-    return _search.request()
+    """Search for keywords by their name."""
+    search = _Search(_SEARCH_V3)
+    search.reset()
+    search.use("search-keyword")
+    search.load_query({"query": query}, page=page)
+    return search.request()
 
 
-def movies(query: str, include_adult=False,
-           language: str = None, region: str = None,
-           year: str = "", primary_release_year: str = "",
-           page=1) -> dict:
-    """Search for movies by their original, translated and 
+def movies(
+    query: str,
+    include_adult=False,
+    language: str = None,
+    region: str = None,
+    year: str = "",
+    primary_release_year: str = "",
+    page=1,
+) -> dict:
+    """Search for movies by their original, translated and
     alternative titles.
     """
-    _search.reset()
-    _search.use("search-movie")
-    _search.language(language)
-    _search.region(region)
-    _search.load_query({"query": query}, include_adult=include_adult,
-                       page=page)
+    search = _Search(_SEARCH_V3)
+    search.reset()
+    search.use("search-movie")
+    search.language(language)
+    search.region(region)
+    search.load_query({"query": query}, include_adult=include_adult, page=page)
     if year != "":
         type_checking("year", year)
-        _search.load_query(year=year)
+        search.load_query(year=year)
     if primary_release_year != "":
         type_checking("year", primary_release_year)
-        _search.load_query(primary_release_year=primary_release_year)
-    return _search.request()
+        search.load_query(primary_release_year=primary_release_year)
+    return search.request()
 
 
-def multi(query: str, include_adult=False, language: str = None,
-          page=1) -> dict:
-    """Use multi search when you want to search for movies, 
+def multi(query: str, include_adult=False, language: str = None, page=1) -> dict:
+    """Use multi search when you want to search for movies,
     TV shows and people in a single request.
     """
-    _search.reset()
-    _search.use("search-multi")
-    _search.language(language)
-    _search.load_query({"query": query}, include_adult=include_adult, page=page)
-    return _search.request()
+    search = _Search(_SEARCH_V3)
+    search.reset()
+    search.use("search-multi")
+    search.language(language)
+    search.load_query({"query": query}, include_adult=include_adult, page=page)
+    return search.request()
 
 
-def person(query: str, include_adult=False, language: str = None,
-           page=1) -> dict:
-    """Search for people by their name and also " "known as names.
-    """
-    _search.reset()
-    _search.use("search-person")
-    _search.language(language)
-    _search.load_query({"query": query}, include_adult=include_adult, page=page)
-    return _search.request()
+def person(query: str, include_adult=False, language: str = None, page=1) -> dict:
+    """Search for people by their name and also " "known as names."""
+    search = _Search(_SEARCH_V3)
+    search.reset()
+    search.use("search-person")
+    search.language(language)
+    search.load_query({"query": query}, include_adult=include_adult, page=page)
+    return search.request()
 
 
-def tv(query: str, include_adult=False, language: str = None,
-       year: str = "", first_air_date_year: str = "",
-       page=1) -> dict:
-    """Search for TV shows by their original, translated and also 
+def tv(
+    query: str,
+    include_adult=False,
+    language: str = None,
+    year: str = "",
+    first_air_date_year: str = "",
+    page=1,
+) -> dict:
+    """Search for TV shows by their original, translated and also
     known as names.
     """
-    _search.reset()
-    _search.use("search-tv")
-    _search.language(language)
-    _search.load_query({"query": query}, include_adult=include_adult,
-                       page=page)
+    search = _Search(_SEARCH_V3)
+    search.reset()
+    search.use("search-tv")
+    search.language(language)
+    search.load_query({"query": query}, include_adult=include_adult, page=page)
     if year != "":
         type_checking("year", year)
-        _search.load_query(year=year)
+        search.load_query(year=year)
     if first_air_date_year != "":
         type_checking("year", first_air_date_year)
-        _search.load_query(first_air_date_year=first_air_date_year)
-    return _search.request()
+        search.load_query(first_air_date_year=first_air_date_year)
+    return search.request()
