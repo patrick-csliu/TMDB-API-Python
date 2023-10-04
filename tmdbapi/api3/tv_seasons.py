@@ -5,7 +5,6 @@
 from tmdbapi._core import Tmdb
 from tmdbapi.exceptions import type_checking
 
-
 _TV_SEASONS_V3 = {
     "tv-season-account-states": {
         "method": "get",

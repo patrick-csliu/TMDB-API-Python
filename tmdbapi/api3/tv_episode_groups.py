@@ -4,7 +4,6 @@
 
 from tmdbapi._core import Tmdb
 
-
 _TV_EPISODE_GROUPS_V3 = {
     "tv-episode-group-details": {
         "method": "get",

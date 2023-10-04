@@ -3,9 +3,7 @@
 """
 
 from tmdbapi._core import Tmdb
-from tmdbapi.exceptions import type_checking
-from tmdbapi.exceptions import ServiceDeprecationWarning
-
+from tmdbapi.exceptions import ServiceDeprecationWarning, type_checking
 
 _PEOPLE_V3 = {
     "person-popular-list": {

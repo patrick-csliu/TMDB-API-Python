@@ -4,7 +4,6 @@
 
 from tmdbapi._core import Tmdb
 
-
 _WATCH_PROVIDERS_V3 = {
     "watch-provider-tv-list": {
         "method": "get",

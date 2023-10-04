@@ -24,6 +24,11 @@ def reload_package():
 
 
 class TestCredentials:
+    def test_getitem(self):
+        cred = tmdbapi.Credential()
+        cred.set('1', '2', '3', 4, '5')
+        assert cred["api_key"] == '2'
+
     def test_set_credentials(self):
         cred = tmdbapi.Credential()
         cred.set(
@@ -39,6 +44,30 @@ class TestCredentials:
             "session_id": "test-session-id",
             "account_id": "test-account-id",
             "account_object_id": "test-account-object-id",
+        }
+
+    def test_set_credentials_overwrite_true(self):
+        cred = tmdbapi.Credential()
+        cred.set('1', '2', '3', 4, '5')
+        cred.set('', '', '5', 0, '', overwrite=True)
+        assert cred == {
+            "access_token": "",
+            "api_key": "",
+            "session_id": "5",
+            "account_id": 0,
+            "account_object_id": "",
+        }
+
+    def test_set_credentials_overwrite_false(self):
+        cred = tmdbapi.Credential()
+        cred.set('1', '2', '3', 4, '5')
+        cred.set('', '', '5', 0, '', overwrite=False)
+        assert cred == {
+            "access_token": "1",
+            "api_key": "2",
+            "session_id": "5",
+            "account_id": 4,
+            "account_object_id": "5",
         }
 
     # def test_pytest_scope(self):
@@ -61,6 +90,36 @@ class TestCredentials:
         cred = tmdbapi.Credential()
         cred.load(CREDENTIAL_PATH)
         assert cred == {
+            "access_token": "1",
+            "api_key": "2",
+            "session_id": "3",
+            "account_id": 4,
+            "account_object_id": "5",
+        }
+
+    def test_load_credentials_auto_update_true(self):
+        cred = tmdbapi.Credential()
+        cred.set("1", "2", "3", 4, "5")
+        cred.save(CREDENTIAL_PATH, auto_update=True)
+        cred.set("2", "3", "4", 5, "6")
+        cred2 = tmdbapi.Credential()
+        cred2.load(CREDENTIAL_PATH)
+        assert cred2 == {
+            "access_token": "2",
+            "api_key": "3",
+            "session_id": "4",
+            "account_id": 5,
+            "account_object_id": "6",
+        }
+
+    def test_load_credentials_auto_update_false(self):
+        cred = tmdbapi.Credential()
+        cred.set("1", "2", "3", 4, "5")
+        cred.save(CREDENTIAL_PATH, auto_update=False)
+        cred.set("2", "3", "4", 5, "6")
+        cred2 = tmdbapi.Credential()
+        cred2.load(CREDENTIAL_PATH)
+        assert cred2 == {
             "access_token": "1",
             "api_key": "2",
             "session_id": "3",
@@ -96,6 +155,21 @@ class TestCredentials:
             "account_object_id": "5",
         }
 
+    def test_pass_check1(self):
+        cred = tmdbapi.Credential()
+        assert cred.pass_check()
+
+    def test_pass_check2(self):
+        cred = tmdbapi.Credential()
+        cred.set("1", "2", "3", 4, "5")
+        assert cred.pass_check("access_token", "account_id")
+
+    def test_pass_check3(self):
+        cred = tmdbapi.Credential()
+        cred.set("1", "2", "3", 0, "5")
+        assert not cred.pass_check("access_token", "account_id")
+
+
 
 class TestSettings:
     def test_default(self):
@@ -125,12 +199,15 @@ class TestSettings:
         tmdbapi.setting.use_cred(cred)
         tmdbapi.setting.set(use_access_token=True)
         assert tmdbapi.setting["use_access_token"] == False
+    
+    def test_default_language(self):
+        tmdbapi.setting.language("zh-TW")
+        assert tmdbapi.setting["default_language"] == "zh-TW"
 
     def test_use_session(self):
         import requests
 
         tmdbapi.setting.set(use_session=True)
-        print(tmdbapi.setting["use_session"])
         pytest.assume(tmdbapi.setting["use_session"] == True)
         pytest.assume(isinstance(tmdbapi._SESSION, requests.Session))
         tmdbapi.setting.set(use_session=False)
@@ -145,3 +222,21 @@ class TestSettings:
         pytest.assume(Path("tmdbapi/tests/temp/TMDB.log").exists())
         tmdbapi.setting.set(log_file=None)
         pytest.assume(len(logger.handlers) == 1)
+    
+    def test_use_cred(self):
+        cred = tmdbapi.Credential()
+        tmdbapi.setting.use_cred(cred)
+        assert isinstance(tmdbapi.setting["credential"], tmdbapi.creds.Credential)
+
+    def test_use_cred_ref1(self):
+        cred = tmdbapi.Credential()
+        tmdbapi.setting.use_cred(cred)
+        cred.set(session_id="q")
+        assert tmdbapi.setting["credential"]["session_id"] == "q"
+
+    def test_use_cred_ref2(self):
+        cred = tmdbapi.Credential()
+        tmdbapi.setting.use_cred(cred)
+        c = tmdbapi.setting["credential"]
+        c.set(session_id="q")
+        assert cred["session_id"] == "q"

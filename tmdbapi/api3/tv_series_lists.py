@@ -4,7 +4,6 @@
 
 from tmdbapi._core import Tmdb
 
-
 _TV_SERIES_LISTS_V3 = {
     "tv-series-airing-today-list": {
         "method": "get",

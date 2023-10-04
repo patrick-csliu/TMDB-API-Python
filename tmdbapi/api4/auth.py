@@ -2,11 +2,7 @@
 
 """
 
-import webbrowser
-from tmdbapi._core import Tmdb, query_yes_no
-
-from tmdbapi import creds
-
+from tmdbapi._core import Tmdb
 
 _AUTH_V4 = {
     "auth-create-access-token": {

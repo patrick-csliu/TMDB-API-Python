@@ -2,11 +2,8 @@
 
 """
 
-
-from tmdbapi._core import Tmdb
-from tmdbapi import creds
 import tmdbapi
-
+from tmdbapi._core import Tmdb
 
 _ACCOUNT_V4 = {
     "account-favorite-movies": {
@@ -118,7 +115,9 @@ class _Account(Tmdb):
         self.reset()
         self.use(use_name)
         self.check_account_object_id()
-        self.load_path_arg(account_object_id=tmdbapi.setting["credential"]["account_object_id"])
+        self.load_path_arg(
+            account_object_id=tmdbapi.setting["credential"]["account_object_id"]
+        )
         self.language(language)
         self.load_query(page=page)
         return self.request()
@@ -130,7 +129,9 @@ def lists(page=1) -> dict:
     account.reset()
     account.use("account-lists")
     account.check_account_object_id()
-    account.load_path_arg(account_object_id=tmdbapi.setting["credential"]["account_object_id"])
+    account.load_path_arg(
+        account_object_id=tmdbapi.setting["credential"]["account_object_id"]
+    )
     account.load_query(page=page)
     return account.request()
 

@@ -4,7 +4,6 @@
 
 from tmdbapi._core import Tmdb
 
-
 _GUEST_SESSIONS_V3 = {
     "guest-session-rated-movies": {
         "method": "get",

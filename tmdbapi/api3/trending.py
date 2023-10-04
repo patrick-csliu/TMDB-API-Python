@@ -5,7 +5,6 @@
 from tmdbapi._core import Tmdb
 from tmdbapi.exceptions import type_checking
 
-
 _TRENDING_V3 = {
     "trending-all": {
         "method": "get",

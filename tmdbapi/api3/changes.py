@@ -5,7 +5,6 @@
 from tmdbapi._core import Tmdb
 from tmdbapi.exceptions import type_checking
 
-
 _CHANGES_V3 = {
     "changes-movie-list": {
         "method": "get",

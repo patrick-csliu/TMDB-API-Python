@@ -28,7 +28,6 @@ _NETWORKS_V3 = {
 
 
 class _Networks(Tmdb):
-
     def __init__(self, info_var):
         super().__init__()
         self.category_path = "/network"
@@ -37,7 +36,7 @@ class _Networks(Tmdb):
     def request(self) -> dict:
         url = self.build_url(3)
         return self.request_raw(
-            url = url,
+            url=url,
         )
 
 
@@ -50,8 +49,7 @@ def details(network_id: int) -> dict:
 
 
 def alternative_names(network_id: int) -> dict:
-    """Get the alternative names of a network.
-    """
+    """Get the alternative names of a network."""
     networks = _Networks(_NETWORKS_V3)
     networks.reset()
     networks.use("details-copy")
@@ -60,8 +58,7 @@ def alternative_names(network_id: int) -> dict:
 
 
 def images(network_id: int) -> dict:
-    """Get the TV network logos by id.
-    """
+    """Get the TV network logos by id."""
     networks = _Networks(_NETWORKS_V3)
     networks.reset()
     networks.use("alternative-names-copy")

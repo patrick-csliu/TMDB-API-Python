@@ -1,8 +1,6 @@
 """Integrating APIs into application.
 """
 
-from . import (auth)
+from . import auth
 
-__all__ = [
-    "auth"
-]
+__all__ = ["auth"]

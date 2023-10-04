@@ -32,8 +32,3 @@ Homepage = "https://github.com/patrick-csliu/TMDB-API-Python"
 Repository = "https://github.com/patrick-csliu/TMDB-API-Python.git"
 # Documentation = "" # No doc currently
 # Changelog = "" # No change log currently
-
-[tool.pytest.ini_options]
-minversion = "7.0"
-addopts = "--pyargs tmdbapi -rF"
-required_plugins = "pytest-assume pytest-dependency"

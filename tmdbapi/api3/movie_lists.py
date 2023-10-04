@@ -4,7 +4,6 @@
 
 from tmdbapi._core import Tmdb
 
-
 _MOVIE_LISTS_V3 = {
     "movie-now-playing-list": {
         "method": "get",

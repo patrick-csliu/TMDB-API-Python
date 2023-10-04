@@ -4,7 +4,6 @@
 
 from tmdbapi._core import Tmdb
 
-
 _REVIEWS_V3 = {
     "review-details": {
         "method": "get",

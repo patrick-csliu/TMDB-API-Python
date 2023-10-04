@@ -1,11 +1,10 @@
-"""
-The Core of the TMDb Request API
+"""The Core of the TMDb Request API
 """
 
+import json as Json
 from logging.handlers import TimedRotatingFileHandler
 from pathlib import Path
 from typing import Optional
-import json as Json
 
 import requests
 
@@ -16,6 +15,8 @@ from tmdbapi.exceptions import STATUS, TmdbApiException
 class Setting:
     """Settings
 
+    This class is used to manage the settings.
+    You can change these settings using the various methods provided by this class.
     ```
     Default settings:
     {
@@ -55,18 +56,36 @@ class Setting:
 
     def __ne__(self, other):
         return self.setting != other
-    
-    def pprint(self):
-        pprint(self.setting)
+
+    def pprint(self, indent=2):
+        """Pretty-print a setting object.
+
+        Parameters
+        ----------
+        indent : int, optional
+            The number of spaces to use for indentation (default is 2).
+        """
+        pprint(self.setting, indent=indent)
 
     def _check_cred_exist(self):
+        """Check credential is load in setting."""
         if self.setting["credential"] is None:
             return False
         else:
             return True
 
     def set(self, **kwargs):
-        """Change settings.
+        """Change multiple settings at once.
+
+        Parameters
+        ----------
+        **kwargs : keyword arguments
+            Key-value pairs representing the settings to be changed.
+
+        Notes
+        -----
+        This method allows you to change multiple settings at once using keyword arguments.
+        The available settings and their default values are as follows:
 
         ```
         Default settings:
@@ -80,10 +99,16 @@ class Setting:
             "credential": None,
         }
         ```
-        Raises
-        ------
-        KeyError
-            If the parameter not in the Settings options.
+
+        You can pass one or more of these settings as keyword arguments in the format
+        setting_name=value to change their values. Any setting not provided in the keyword
+        arguments will remain unchanged.
+
+        Example
+        -------
+        To change the default language and enable logging:
+        >>> setting.set(default_language='en-US', log_file='/path/to/logs')
+
         """
         settings = kwargs.keys()
         if not set(settings).issubset(self.setting.keys()):
@@ -106,6 +131,23 @@ class Setting:
             self.use_cred(kwargs["credential"])
 
     def use_access_token(self, use: bool):
+        """Toggle the use of an access token for API authentication.
+
+        Parameters
+        ----------
+        use : bool
+            A boolean value indicating whether to use an access token for API requests.
+
+        Notes
+        -----
+        This method allows you to toggle the use of an access token for API authentication.
+        An access token is a form of authentication used for secure API access. If 'use' is
+        set to True, the API will use an access token for authentication.
+
+        To use an access token, you must first set up the credentials by calling the
+        'use_cred' method to provide the necessary authentication information.
+
+        """
         if self._check_cred_exist():
             cred = self.setting["credential"]
         else:
@@ -120,18 +162,120 @@ class Setting:
                 tmdbapi.LOGGER.info(f'Setting: "use_access_token": {use}.')
 
     def timeout(self, timeout: Optional[float | tuple] = None):
+        """Set the HTTP request timeout for connecting and reading data.
+
+        Parameters
+        ----------
+        timeout : float or tuple, optional
+            The timeout value in seconds, or a tuple of (connect timeout, read timeout).
+            If None, requests will not time out (default is None).
+
+        Notes
+        -----
+        This method allows you to set the timeout for HTTP requests, controlling how
+        long the client will wait for the server to send data before giving up. The
+        timeout can be specified as a single float value for both connect and read
+        timeouts, or as a tuple where the first value is the connect timeout and the
+        second value is the read timeout.
+
+        Connect timeout: The time to wait for the client to establish a connection to
+        the remote server. It is recommended to set this slightly larger than a
+        multiple of 3 for better performance.
+
+        Read timeout: The time to wait for the server to send a response once the
+        connection is established. This is the time between bytes sent from the server,
+        and in most cases, it represents the time before the server sends the first byte.
+
+        See: https://requests.readthedocs.io/en/latest/user/advanced/#timeouts
+
+        Example
+        -------
+        To set a 5-second timeout:
+        >>> setting.timeout(5)
+
+        To set a connect timeout of 3 seconds and a read timeout of 27 seconds:
+        >>> setting.timeout((3.0, 27.0))
+
+        To disable timeouts (wait indefinitely):
+        >>> setting.timeout(None)
+        """
         self.setting["timeout"] = timeout
         tmdbapi.LOGGER.info(f'Setting: "timeout": {timeout}.')
 
     def language(self, language: Optional[str]):
+        """Set the default language for API requests.
+
+        Parameters
+        ----------
+        language : str or None, optional
+            The default language code to be used for API requests, in the format 'language-COUNTRY'
+            following ISO 639-1 Language Codes and ISO 3166-1 Country Codes.
+            e.g., 'en-US' for English (United States). Pass None to disable default language.
+
+        Notes
+        -----
+        API call function's language setting will take precedence over the default language.
+        If a API call function is not provided, it will be used as the default language for requests.
+        If both is None, the requests will not include the language parameter.
+
+        Example
+        -------
+        To set the default language to English (United States):
+        >>> setting.language('en-US')
+
+        To disable the default language setting:
+        >>> setting.language(None)
+
+        """
         self.setting["default_language"] = language
         tmdbapi.LOGGER.info(f'Setting: "default_language": {language}.')
 
     def region(self, region: Optional[str]):
+        """Set the default region for API requests.
+
+        Parameters
+        ----------
+        region : str or None, optional
+            The default ISO 3166-1 Country Code to be used for API requests.
+            Pass None to disable default region.
+
+        Notes
+        -----
+        API call function's region setting will take precedence over the default region.
+        If a API call function is not provided, it will be used as the default region for requests.
+        If both is None, the requests will not include the region parameter.
+
+        Example
+        -------
+        To set the default region to the United States:
+        >>> setting.region('US')
+
+        To disable the default region setting:
+        >>> setting.region(None)
+
+        """
         self.setting["default_region"] = region
         tmdbapi.LOGGER.info(f'Setting: "default_region": {region}.')
 
     def use_session(self, use: bool):
+        """Toggle the use of session for HTTP requests.
+
+        Parameters
+        ----------
+        use : bool
+            A boolean value indicating whether to use a session for HTTP requests.
+
+        Notes
+        -----
+        This method allows you to toggle the use of a session for HTTP requests. A session
+        object helps in persisting certain parameters and cookies across multiple requests
+        made from the same session instance, leading to potential performance improvements
+        when making several requests to the same host.
+
+        If 'use' is set to True, a new session object will be created and used for subsequent
+        requests. If 'use' is set to False, disabling the use of a session.
+
+        """
         if use != self.setting["use_session"]:
             if use:
                 tmdbapi._SESSION = requests.Session()
@@ -141,76 +285,79 @@ class Setting:
             tmdbapi.LOGGER.info(f'Setting: "use_session": {use}.')
 
     def log(self, directory: Optional[str]):
+        """Enable or disable logging to a specified directory.
+
+        Parameters
+        ----------
+        directory : str or None
+            The directory where log files will be stored. Pass None to disable logging.
+
+        Notes
+        -----
+        This method enables or disables logging to a specified directory. If the 'directory'
+        argument is None, logging will be disabled. Otherwise, log files will be stored
+        in the provided directory.
+
+        Example
+        -------
+        To enable logging to a directory:
+        >>> setting.log("/path/to/logs")
+
+        To disable logging:
+        >>> setting.log(None)
+
+        """
         if directory != self.setting["log_file"]:
             if directory is None:
                 tmdbapi.LOGGER.handlers.pop()
-                tmdbapi.LOGGER.info(f"Setting: Disable log file.")
+                tmdbapi.LOGGER.info("Setting: Disable log file.")
             else:
                 Path(directory).mkdir(parents=True, exist_ok=True)
                 filename = str(Path(directory) / "TMDB.log")
-                ch2 = TimedRotatingFileHandler(filename, when="h", interval=1)
+                ch2 = TimedRotatingFileHandler(
+                    filename, when="h", interval=1, encoding="utf-8"
+                )
                 ch2.setFormatter(tmdbapi.LOG_FORMATTER)
                 ch2.namer = lambda name: name.replace(".log", "") + ".log"
                 tmdbapi.LOGGER.addHandler(ch2)
-                tmdbapi.LOGGER.info(f"Setting: Log files at: {directory}.")
+                tmdbapi.LOGGER.info(
+                    f"Setting: Log will store at: {Path(directory).absolute()}."
+                )
             self.setting["log_file"] = directory
 
     def use_cred(self, credential):
+        """Set user credentials in the settings.
+
+        Parameters
+        ----------
+        credential : tmdbapi.creds.Credential
+            A object containing user credentials for the TMDB API.
+
+        Notes
+        -----
+        This method stores the user's credentials in the settings.
+        After calling this method, the credentials are available for API requests.
+
+        Example
+        -------
+        To set user credentials:
+        >>> import tmdbapi
+        >>> user_credentials = tmdbapi.Credential()
+        >>> user_credentials.set(
+        ...     api_key="your_api_key",
+        ...     access_token="your_access_token"
+        ... )
+        >>> setting.use_cred(user_credentials)
+
+        """
         self.setting["credential"] = credential
         tmdbapi.LOGGER.info(
-            f"Setting: Your credentials have been successfully set in the settings."
+            "Setting: Your credentials have been successfully set in the settings."
         )
 
 
 class Tmdb:
-    """The Tmdb class provides a Python interface for making requests to the TMDb (The Movie Database) API.
-
-    Attributes:
-        _headers (dict): Default headers for API requests.
-
-        session (requests.Session): A session for making HTTP requests.
-
-        category_path (str): The base path for each API category.
-
-        info_var (dict): The information dictionary for each API category. This dictionary contains HTTP request
-            method, path, and parameters for each service.
-
-    Methods:
-        __init__(self): Initialize a new instance of the Tmdb class.
-
-        _authentication(self, headers: dict, params: dict) -> tuple[dict, dict]: Set the headers and query parameters
-            based on the 'use_access_token' setting.
-
-        check_token(self) -> dict: Check if the application is using an access_token or api_key and return the
-            appropriate query parameters.
-
-        choose_session_id(self, guest_session_id: str): Choose a session_id based on the provided `guest_session_id`
-            or use the default `session_id`.
-
-        use(self, name: str): Select a service from the information dictionary.
-
-        load_query(self, query={}, **kwargs): Update the query parameters for the API request.
-
-        load_path_arg(self, args={}, **kwargs): Update the path parameters in the relative URL.
-
-        load_json(self, json_dict: dict): Provide a JSON payload for the API request.
-
-        build_url(self, version: int) -> str: Build the URL for the API request.
-
-        sortby(self, asc: bool): Update the query parameters with valid values for sorting.
-
-        language(self, lang: str = None): Update the language parameter in the query.
-
-        region(self, region: str = None): Update the region parameter in the query.
-
-        reset(self): Clear all content in class variables.
-
-        check_params(self, params: dict) -> bool: Check if the given parameters keys are all valid.
-
-        request_raw(self, url: str, method: str = None, params: dict = None, data=None, json: dict = None) -> dict: Send
-            the API request and handle the response.
-
-    """
+    """The Tmdb class provides a Python interface for making requests to the TMDb (The Movie Database) API."""
 
     headers = {
         "accept": "application/json",
@@ -254,8 +401,8 @@ class Tmdb:
             if self._cred.pass_check("api_key"):
                 params["api_key"] = self._cred["api_key"]
             else:
-                tmdbapi.LOGGER.error("No api_key given, please set the api_key.")
-                raise Exception("No api_key given, please set the api_key.")
+                tmdbapi.LOGGER.error("No API key provided. Please set the API key.")
+                raise Exception("No API key provided. Please set the API key.")
         return headers, params
 
     def check_token(self) -> Optional[dict]:
@@ -475,7 +622,6 @@ class Tmdb:
             If the action is not successful.
         """
         # set method, query(params), headers, json payload
-        #
         if method is None:
             method = self._method.upper()
         else:
@@ -491,35 +637,32 @@ class Tmdb:
         if json is not None:
             headers["content-type"] = "application/json"
 
-        # debug print #
-        print("json:", json)
-        print(method, headers)
+        # debug info #
+        tmdbapi.LOGGER.debug(f"Json payload: {json}")
+        tmdbapi.LOGGER.debug(f"Headers: {headers}")
 
         # send request to tmdb api
-        #
         if tmdbapi.setting["use_session"]:
-            request = self.session
+            request = tmdbapi._SESSION
         else:
             request = requests
-        # if self.cache and method == "GET":
-        # response = self.cached_request(method, url, params=params,
-        #                                headers=headers)
-        # response = request.request(method, url, params=params,
-        #                            headers=headers)
-        # else:
-        response = request.request(
-            method,
-            url,
-            data=data,
-            json=json,  # proxies=self.proxies,
-            params=params,
-            headers=headers,
-            timeout=tmdbapi.setting["timeout"],
-        )
+
+        try:
+            response = request.request(
+                method,
+                url,
+                data=data,
+                json=json,
+                params=params,
+                headers=headers,
+                timeout=tmdbapi.setting["timeout"],
+            )
+        except Exception as err:
+            tmdbapi.LOGGER.error(f"{type(err).__module__}.{type(err).__name__}: {err}")
+            raise err
 
         headers = response.headers
         header_status_code = response.status_code
-        # debug print #
         tmdbapi.LOGGER.info(
             f"status_code: {header_status_code}, {method}: {response.url}"
         )
@@ -571,6 +714,17 @@ def query_yes_no(question: str, default="yes"):
             print("Please respond with 'yes' or 'no' " "(or 'y' or 'n').")
 
 
-def pprint(json, indent=2):
+def pprint(json: list | dict, indent=2):
+    """Pretty-print a JSON object.
+
+    This function takes a JSON object and prints it in a more human-readable
+    format with optional indentation.
+
+    Parameters
+    ----------
+    json : list or dict
+        The JSON object to be pretty-printed.
+    indent : int, optional
+        The number of spaces to use for indentation (default is 2).
+    """
     print(Json.dumps(json, indent=indent))
-    

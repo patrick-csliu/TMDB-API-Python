@@ -4,7 +4,6 @@
 
 from tmdbapi._core import Tmdb
 
-
 _GENRES_V3 = {
     "genre-movie-list": {
         "method": "get",

@@ -4,7 +4,6 @@
 
 from tmdbapi._core import Tmdb
 
-
 _COLLECTION_V3 = {
     "collection-details": {
         "method": "get",

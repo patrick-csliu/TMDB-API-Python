@@ -4,7 +4,6 @@
 
 from tmdbapi._core import Tmdb
 
-
 _COMPANIES_V3 = {
     "company-alternative-names": {
         "method": "get",

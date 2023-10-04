@@ -7,7 +7,7 @@ This module defines exceptions and warnings used by the `tmdbapi` package.
 Warnings
 --------
 
-    `ServiceDeprecationWarning`: This warning is raised when a service (protocol) is deprecated by TMDB.
+    `ServiceDeprecationWarning`: This warning is raised when a service (method) is deprecated by TMDB.
 
 Exceptions
 ----------
@@ -71,6 +71,7 @@ STATUS = [
 ]
 
 import re
+
 import tmdbapi
 
 

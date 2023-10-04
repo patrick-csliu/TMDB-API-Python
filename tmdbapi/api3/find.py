@@ -5,7 +5,6 @@
 from tmdbapi._core import Tmdb
 from tmdbapi.exceptions import type_checking
 
-
 _FIND_V3 = {
     "find-by-id": {
         "method": "get",

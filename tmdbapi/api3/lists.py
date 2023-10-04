@@ -4,7 +4,6 @@
 
 from tmdbapi._core import Tmdb
 
-
 _LISTS_V3 = {
     "list-add-movie": {
         "method": "post",

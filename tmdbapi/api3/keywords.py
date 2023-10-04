@@ -5,7 +5,6 @@
 from tmdbapi._core import Tmdb
 from tmdbapi.exceptions import ServiceDeprecationWarning
 
-
 _KEYWORDS_V3 = {
     "keyword-details": {
         "method": "get",

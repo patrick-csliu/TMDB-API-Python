@@ -4,7 +4,6 @@
 
 from tmdbapi._core import Tmdb
 
-
 _CREDITS_V3 = {
     "credit-details": {
         "method": "get",

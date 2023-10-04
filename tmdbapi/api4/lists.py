@@ -2,9 +2,9 @@
 
 """
 
+import tmdbapi
 from tmdbapi._core import Tmdb
 from tmdbapi.exceptions import type_checking
-import tmdbapi
 
 _LISTS_V4 = {
     "list-add-items": {

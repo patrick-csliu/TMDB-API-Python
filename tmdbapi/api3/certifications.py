@@ -4,7 +4,6 @@
 
 from tmdbapi._core import Tmdb
 
-
 _CERTIFICATION_V3 = {
     "certification-movie-list": {
         "method": "get",

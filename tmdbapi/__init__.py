@@ -17,16 +17,17 @@ if not any(isinstance(x, _logging.StreamHandler) for x in LOGGER.handlers):
     LOGGER.setLevel(_logging.INFO)
 
 
-from ._core import Setting as _Setting, pprint
+from ._core import Setting as _Setting
+from ._core import pprint
 
 setting = _Setting()
 
 
-from .creds import Credential
 from . import api3, api4, integration
+from .creds import Credential
 
-_submodules = ["api3", "api4", "tests", "cred", "exceptions"]
-__all__ = _submodules + ["Setting", "Credential"]
+_submodules = ["api3", "api4", "integration", "tests", "cred", "exceptions"]
+__all__ = _submodules + ["Setting", "Credential", "pprint"]
 
 
 _SESSION = None  # requests.Session

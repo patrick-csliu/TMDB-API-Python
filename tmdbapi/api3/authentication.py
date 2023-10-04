@@ -4,7 +4,6 @@
 
 from tmdbapi._core import Tmdb
 
-
 _AUTHENTICATION_V3 = {
     "authentication-create-guest-session": {
         "method": "get",

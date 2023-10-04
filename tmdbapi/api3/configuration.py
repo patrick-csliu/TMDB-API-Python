@@ -4,7 +4,6 @@
 
 from tmdbapi._core import Tmdb
 
-
 _CONFIGURATION_V3 = {
     "configuration-countries": {
         "method": "get",

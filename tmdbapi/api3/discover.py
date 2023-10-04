@@ -2,8 +2,6 @@
 
 """
 from tmdbapi._core import Tmdb
-from tmdbapi.exceptions import type_checking
-
 
 _DISCOVER_V3 = {
     "discover-movie": {

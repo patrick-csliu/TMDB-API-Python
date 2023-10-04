@@ -7,7 +7,6 @@ query: Use '+' between the keywords
 from tmdbapi._core import Tmdb
 from tmdbapi.exceptions import type_checking
 
-
 _SEARCH_V3 = {
     "search-collection": {
         "method": "get",
