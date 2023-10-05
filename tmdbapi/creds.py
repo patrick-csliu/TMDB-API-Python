@@ -308,15 +308,17 @@ class Credential:
             A dictionary that maps credential variable names to their corresponding
             environment variable names if they are different from the defaults.
             Default:
-            ```
-            {
-                "access_token": "TMDB_ACCESS_TOKEN",
-                "api_key": "TMDB_API_KEY",
-                "session_id": "TMDB_SESSION_ID",
-                "account_id": "TMDB_ACCOUNT_ID",
-                "account_object_id": "TMDB_ACCOUNT_OBJECT_ID",
-            }
-            ```
+
+            .. code-block:: python
+
+                {
+                    "access_token": "TMDB_ACCESS_TOKEN",
+                    "api_key": "TMDB_API_KEY",
+                    "session_id": "TMDB_SESSION_ID",
+                    "account_id": "TMDB_ACCOUNT_ID",
+                    "account_object_id": "TMDB_ACCOUNT_OBJECT_ID",
+                }
+
             You cannot change the keys in this dictionary.
 
         Notes

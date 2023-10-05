@@ -17,18 +17,21 @@ class Setting:
 
     This class is used to manage the settings.
     You can change these settings using the various methods provided by this class.
-    ```
+
     Default settings:
-    {
-        "use_access_token": False,
-        "timeout": None,
-        "default_language": None,
-        "default_region": None,
-        "use_session": False,
-        "log_file": None,
-        "credential": None,
-    }
-    ```
+
+    .. code-block:: python
+
+        {
+            "use_access_token": False,
+            "timeout": None,
+            "default_language": None,
+            "default_region": None,
+            "use_session": False,
+            "log_file": None,
+            "credential": None,
+        }
+
     """
 
     def __init__(self):
@@ -87,18 +90,19 @@ class Setting:
         This method allows you to change multiple settings at once using keyword arguments.
         The available settings and their default values are as follows:
 
-        ```
         Default settings:
-        {
-            "use_access_token": False,
-            "timeout": None,
-            "default_language": None,
-            "default_region": None,
-            "use_session": False,
-            "log_file": None,
-            "credential": None,
-        }
-        ```
+
+        .. code-block:: python
+
+            {
+                "use_access_token": False,
+                "timeout": None,
+                "default_language": None,
+                "default_region": None,
+                "use_session": False,
+                "log_file": None,
+                "credential": None,
+            }
 
         You can pass one or more of these settings as keyword arguments in the format
         setting_name=value to change their values. Any setting not provided in the keyword

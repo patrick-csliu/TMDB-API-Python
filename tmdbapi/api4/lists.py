@@ -103,37 +103,33 @@ def add_items(list_id: int, items: list) -> dict:
         Some items may not have comments. For tuples and lists, their length
         can be 2, while for dictionaries, the 'comment' key may be absent.
 
-        1.
-        ```
-        [
-            ("movie", 194662, "Amazing movie!"),
-            ("movie", 76203, "Wow."),
-        ]
-        ```
+        .. code-block:: python
 
-        2.
-        ```
-        [
-            ["movie", 194662, "Amazing movie!"],
-            ["movie", 76203, "Wow."],
-        ]
-        ```
+            # 1.
+            [
+                ("movie", 194662, "Amazing movie!"),
+                ("movie", 76203, "Wow."),
+            ]
 
-        3.
-        ```
-        [
-            {
-                "media_type": "movie",
-                "media_id": 194662,
-                "comment": "Amazing movie!"
-            },
-            {
-                "media_type": "movie",
-                "media_id": 76203,
-                "comment": "Wow."
-            },
-        ]
-        ```
+            # 2.
+            [
+                ["movie", 194662, "Amazing movie!"],
+                ["movie", 76203, "Wow."],
+            ]
+
+            # 3.
+            [
+                {
+                    "media_type": "movie",
+                    "media_id": 194662,
+                    "comment": "Amazing movie!"
+                },
+                {
+                    "media_type": "movie",
+                    "media_id": 76203,
+                    "comment": "Wow."
+                },
+            ]
 
     Returns
     -------
@@ -248,35 +244,31 @@ def remove_items(list_id: int, items: list) -> dict:
     items : list
         Support three types of list.
 
-        1.
-        ```
-        [
-            ("movie", 194662),
-            ("movie", 76203),
-        ]
-        ```
+        .. code-block:: python
 
-        2.
-        ```
-        [
-            ["movie", 194662],
-            ["movie", 76203],
-        ]
-        ```
+            # 1.
+            [
+                ("movie", 194662),
+                ("movie", 76203),
+            ]
 
-        3.
-        ```
-        [
-            {
-                "media_type": "movie",
-                "media_id": 194662,
-            },
-            {
-                "media_type": "movie",
-                "media_id": 76203,
-            },
-        ]
-        ```
+            # 2.
+            [
+                ["movie", 194662],
+                ["movie", 76203],
+            ]
+
+            # 3.
+            [
+                {
+                    "media_type": "movie",
+                    "media_id": 194662,
+                },
+                {
+                    "media_type": "movie",
+                    "media_id": 76203,
+                },
+            ]
 
     Returns
     -------
@@ -370,37 +362,33 @@ def update_items(list_id: int, items: list) -> dict:
         and lists, the length could be 2, and for dictionaries, the
         'comment' key might not be present.
 
-        1.
-        ```
-        [
-            ("movie", 194662, "Amazing movie!"),
-            ("movie", 76203, "Wow."),
-        ]
-        ```
+        .. code-block:: python
 
-        2.
-        ```
-        [
-            ["movie", 194662, "Amazing movie!"],
-            ["movie", 76203, "Wow."],
-        ]
-        ```
+            # 1.
+            [
+                ("movie", 194662, "Amazing movie!"),
+                ("movie", 76203, "Wow."),
+            ]
 
-        3.
-        ```
-        [
-            {
-                "media_type": "movie",
-                "media_id": 194662,
-                "comment": "Amazing movie!"
-            },
-            {
-                "media_type": "movie",
-                "media_id": 76203,
-                "comment": "Wow."
-            },
-        ]
-        ```
+            # 2.
+            [
+                ["movie", 194662, "Amazing movie!"],
+                ["movie", 76203, "Wow."],
+            ]
+
+            # 3.
+            [
+                {
+                    "media_type": "movie",
+                    "media_id": 194662,
+                    "comment": "Amazing movie!"
+                },
+                {
+                    "media_type": "movie",
+                    "media_id": 76203,
+                    "comment": "Wow."
+                },
+            ]
 
     Returns
     -------
@@ -425,45 +413,22 @@ def _pack_items(items: list) -> dict:
         Some items may not have comments. For tuples and lists, their length
         can be 2, while for dictionaries, the 'comment' key may be absent.
 
-        1.
-        ```
-        [
-            ("movie", 194662, "Amazing movie!"),
-            ("movie", 76203, "Wow."),
-        ]
-        ```
+        .. code-block:: python
 
-        2.
-        ```
-        [
-            ["movie", 194662, "Amazing movie!"],
-            ["movie", 76203, "Wow."],
-        ]
-        ```
+            # 1.
+            [
+                ("movie", 194662, "Amazing movie!"),
+                ("movie", 76203, "Wow."),
+            ]
 
-        3.
-        ```
-        [
-            {
-                "media_type": "movie",
-                "media_id": 194662,
-                "comment": "Amazing movie!"
-            },
-            {
-                "media_type": "movie",
-                "media_id": 76203,
-                "comment": "Wow."
-            },
-        ]
-        ```
+            # 2.
+            [
+                ["movie", 194662, "Amazing movie!"],
+                ["movie", 76203, "Wow."],
+            ]
 
-    Returns
-    -------
-    dict
-        example:
-        ```
-        {
-            "items": [
+            # 3.
+            [
                 {
                     "media_type": "movie",
                     "media_id": 194662,
@@ -473,10 +438,31 @@ def _pack_items(items: list) -> dict:
                     "media_type": "movie",
                     "media_id": 76203,
                     "comment": "Wow."
-                }
+                },
             ]
-        }
-        ```
+
+    Returns
+    -------
+    dict
+        example:
+
+        .. code-block:: python
+
+            {
+                "items": [
+                    {
+                        "media_type": "movie",
+                        "media_id": 194662,
+                        "comment": "Amazing movie!"
+                    },
+                    {
+                        "media_type": "movie",
+                        "media_id": 76203,
+                        "comment": "Wow."
+                    }
+                ]
+            }
+
     """
 
     def _pack_items_list(items: list[list] | list[tuple]) -> dict:
