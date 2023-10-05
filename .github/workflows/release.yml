@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - name: Set up Python 3.11
+    - name: Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: "3.11.5"
@@ -51,7 +51,7 @@ jobs:
           git commit -m "auto commit (Github release workflow)"
         fi
         git tag $VERSION
-        git push origin $VERSION main
+        git push origin $VERSION master
       env:
         VERSION: ${{ steps.version_parse.outputs.VERSION }}
     - name: Create Release
@@ -83,7 +83,7 @@ jobs:
 
   #   environment:
   #     name: testpypi
-  #     url: https://test.pypi.org/p/<package-name>  # Replace <package-name> with your TestPyPI project name
+  #     url: https://test.pypi.org/p/TMDB-Py  # Replace <package-name> with your TestPyPI project name
 
   #   permissions:
   #     id-token: write  # IMPORTANT: mandatory for trusted publishing
@@ -98,23 +98,23 @@ jobs:
   #     uses: pypa/gh-action-pypi-publish@release/v1
   #     with:
   #       repository-url: https://test.pypi.org/legacy/
-  # publish-to-pypi:
-  #   name: >-
-  #     Publish Python distribution 📦 to PyPI
-  #   needs:
-  #   - build
-  #   runs-on: ubuntu-latest
-  #   environment:
-  #     name: pypi
-  #     url: https://pypi.org/p/<package-name>  # Replace <package-name> with your PyPI project name
-  #   permissions:
-  #     id-token: write  # IMPORTANT: mandatory for trusted publishing
+  publish-to-pypi:
+    name: >-
+      Publish Python distribution 📦 to PyPI
+    needs:
+    - build
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/TMDB-Py
+    permissions:
+      id-token: write  # IMPORTANT: mandatory for trusted publishing
 
-  #   steps:
-  #   - name: Download all the dists
-  #     uses: actions/download-artifact@v3
-  #     with:
-  #       name: python-package-distributions
-  #       path: dist/
-  #   - name: Publish distribution 📦 to PyPI
-  #     uses: pypa/gh-action-pypi-publish@release/v1
+    steps:
+    - name: Download all the dists
+      uses: actions/download-artifact@v3
+      with:
+        name: python-package-distributions
+        path: dist/
+    - name: Publish distribution 📦 to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1

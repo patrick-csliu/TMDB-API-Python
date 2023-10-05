@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tmdbapi"
-version = "v0.0.1"
+version = "v1.0.0"
 license = {file = "LICENSE"}
 authors = [
   { name="Patrick Liu", email="32678320+patrick-csliu@users.noreply.github.com"}
@@ -12,12 +12,14 @@ authors = [
 maintainers = [
   { name="Patrick Liu", email="32678320+patrick-csliu@users.noreply.github.com"}
 ]
-description = "TheMovieDB (TMDB) API Python Library"
+description = "TheMovieDB (TMDB) API Python Request Library"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
   "pytest",
   "Requests",
+  "pytest-assume",
+  "pytest-dependency",
 ]
 classifiers = [
     "Programming Language :: Python :: 3",

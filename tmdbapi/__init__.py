@@ -1,5 +1,43 @@
 """A TMDB API Library
 
+A comprehensive Python library for interacting with TheMovieDB API, 
+supporting both version 3 and version 4.
+This package includes subpackages, modules, and utilities for seamless 
+access to the TMDB API.
+
+Subpackages
+-----------
+- `api3`: TMDB API version 3 methods and endpoints.
+- `api4`: TMDB API version 4 methods and endpoints.
+- `integration`: High-level functions and integration features for simplifying 
+interactions with TMDB.
+- `tests`: Contains unit tests using pytest.
+
+Modules
+-------
+- `creds.py`: Manages credentials for API access.
+- `exceptions.py`: Contains custom exception and warning classes.
+- `_core.py`: The main part of the TMDB request class and the Setting class 
+for API configuration.
+
+Documentation
+-------------
+Documentation is available through docstrings provided with the code,
+and can also be accessed on the <https://github.com/patrick-csliu/TMDB-API-Python>.
+
+Getting Started
+---------------
+To begin using the library, start by loading your credentials:
+
+    >>> import tmdbapi
+    >>> cred = tmdbapi.Credential()
+    >>> cred.set(api_key="your_api_key",
+    ...          access_token="your_access_token",
+    ...          account_object_id="your_account_object_id")
+    >>> tmdbapi.setting.use_cred(cred)
+
+License:
+This package is distributed under the MIT License.
 
 """
 

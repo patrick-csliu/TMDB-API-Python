@@ -15,7 +15,7 @@ def create_session_id():
     tmdbapi.setting["credential"].set(session_id=session_id)
 
 
-def access_token():
+def create_access_token():
     """Create a write permission access_token"""
     request_token = tmdbapi.api4.auth.create_request_token()["request_token"]
     approve_url = (
