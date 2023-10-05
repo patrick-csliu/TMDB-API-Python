@@ -59,7 +59,7 @@ TMDB API Python Library: A comprehensive Python library for interacting with The
     pprint(response)
     ```
     > [!NOTE]  
-    > In version 3, to access account catalog methods, you need the `account_id`, while in version 4, you require the `account_object_id`
+    > In version 3, accessing account catalog methods generally requires both the `account_id` and `session_id`, with the exception of `api3.account.details`, which does not need the `account_id`. In version 4, you require the `account_object_id`
 
 ## Contributing
 
@@ -108,7 +108,9 @@ Contributions that introduce new features or enhance existing ones are always we
         > *account_object_id*
 
         > [!Note]  
-        > To obtain your `account_id`, use the `api3.account.details` method. To acquire your `account_object_id`, you need to generate a "write" `access_token`. This process will return both the `account_object_id` and the "write" `access_token`.
+        > To obtain your `account_id`, use the `api3.account.details` method (requires `session_id`; if the `access_token` is provided, the `session_id` can be optional). If neither `session_id` nor `access_token` is provided, when needed, it will automatically start the generation process. Alternatively, you can generate it using `tmdbapi.integration.auth.create_session_id()`.
+        > 
+        > To acquire your `account_object_id`, you need to generate a "write" `access_token`. This process will return both the `account_object_id` and the "write" `access_token`.
         
         > [!Note]  
         > The original `access_token` provided by the TMDB API only allows reading. If you need to perform operations such as managing lists, you must generate a "write" `access_token` using `tmdbapi.integration.auth.create_session_id()`. Remember to keep it.

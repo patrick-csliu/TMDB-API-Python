@@ -19,7 +19,7 @@ jobs:
         if [ -f build_requirements.txt ]; then pip install -r build_requirements.txt; fi
     - name: Setting version
       run: |
-        VAR1=$(python version.py)
+        VAR1=$(python release.py)
         IFS=' ' read -r VAR2 VAR3 <<< "$VAR1"
         echo "VERSION=$VAR2" >> "$GITHUB_OUTPUT"
         echo "LOG_PATH=$VAR3" >> "$GITHUB_OUTPUT"

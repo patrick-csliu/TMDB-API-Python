@@ -95,7 +95,7 @@ class TmdbApiException(Exception):
     """
     def __init__(self, *message):
         msg = ", ".join(message)
-        tmdbapi.LOGGER.warning(f"TmdbApiException: {msg}")
+        tmdbapi.LOGGER.error(f"TmdbApiException: {msg}")
 
 
 def type_checking(keyword, value):
