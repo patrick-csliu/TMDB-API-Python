@@ -3,7 +3,8 @@ requires = ["setuptools>=68.0"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-packages = ["tmdbapi", "tmdbapi.api3", "tmdbapi.api4", "tmdbapi.integration", "tmdbapi.tests", ]
+packages = ["tmdbapi", "tmdbapi.api3", "tmdbapi.api4", "tmdbapi.integration",
+            "tmdbapi.tests", "tmdbapi.tests.api3", "tmdbapi.tests.api4"]
 
 [project]
 name = "tmdbapi"
