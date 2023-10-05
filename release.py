@@ -51,7 +51,7 @@ if __name__ == "__main__":
             f.write(CHANGELOG_TEMPLATE)
 
     # Create README.md
-    with open("docs/README_template.md", "r", encoding="utf-8") as f:
+    with open("docs/readme_template.md", "r", encoding="utf-8") as f:
         readme_file = Insert(f.read())
     # point 0
     content_p0 = INSERTS[0][1].format(version=version)
