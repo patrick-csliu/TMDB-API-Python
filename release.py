@@ -7,7 +7,10 @@ CHANGELOG_TEMPLATE = """
 """
 
 INSERTS = [
-    ("github_release", "[Release {version}](https://github.com/patrick-csliu/TMDB-API-Python/releases/tag/{version})"),
+    (
+        "github_release",
+        "[Release {version}](https://github.com/patrick-csliu/TMDB-API-Python/releases/tag/{version})",
+    ),
     ("version", "{version}"),
 ]
 
@@ -48,14 +51,15 @@ if __name__ == "__main__":
             f.write(CHANGELOG_TEMPLATE)
 
     # Create README.md
-    with open("docs/README_repo.md", "r", encoding="utf-8") as f:
+    with open("docs/README_template.md", "r", encoding="utf-8") as f:
         readme_file = Insert(f.read())
     # point 0
     content_p0 = INSERTS[0][1].format(version=version)
     readme_file.insert_content(INSERTS[0][0], content_p0)
     # point 1
-    content_p1 = INSERTS[1][1]
+    content_p1 = INSERTS[1][1].format(version=version)
     readme_file.insert_content(INSERTS[1][0], content_p1)
+    # save the file
     with open("README.md", "w", encoding="utf-8") as f:
         f.write(readme_file.get_content())
 

@@ -7,7 +7,7 @@ packages = ["tmdbapi", "tmdbapi.api3", "tmdbapi.api4", "tmdbapi.integration",
             "tmdbapi.tests", "tmdbapi.tests.api3", "tmdbapi.tests.api4"]
 
 [project]
-name = "tmdbapi"
+name = "TMDB-Py"
 version = "v1.0.0"
 license = {file = "LICENSE"}
 authors = [
