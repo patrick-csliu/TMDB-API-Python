@@ -1,5 +1,6 @@
 import shutil
 from pathlib import Path
+
 import pytest
 
 # @pytest.fixture(autouse=True)
@@ -13,23 +14,15 @@ import pytest
 #     # clean up after tests
 #     shutil.rmtree("tmdbapi/tests/temp", ignore_errors=True)
 
+
 def pytest_addoption(parser):
+    """An command line option to specify credential file"""
     parser.addoption(
         "--cred",
         action="store",
         help="Specify the path to the credential file",
         type=Path,
     )
-
-
-# @pytest.fixture
-# def credential_path(request) -> str:
-#     path = request.config.getoption("--cred")
-#     # pyth = pytest.Config().getoption("--cred")
-#     if path is None:
-#         return Path("test.credential").absolute()
-#     else:
-#         return path.absolute()
 
 
 def pytest_configure(config):
@@ -40,16 +33,20 @@ def pytest_configure(config):
     """
     path = config.getoption("--cred")
     if path is None:
-        cred_path =  Path("test.credential").absolute()
+        cred_path = Path("test.credential")
     else:
-        cred_path =  path.absolute()
-    print(cred_path)
-    # print("!!!!!!!!!!!!!!!!!!", type(credential_path), credential_path)
+        cred_path = path
+    if cred_path.is_file():
+        path_text = cred_path.absolute()
+    else:
+        raise FileNotFoundError(f"Not found: {path_text}")
+
     Path("tmdbapi/tests/temp").mkdir(parents=True, exist_ok=True)
-    shutil.copyfile(cred_path, "tmdbapi/tests/temp/test.credential")
+    shutil.copyfile(path_text, "tmdbapi/tests/temp/test.credential")
 
 
 def pytest_unconfigure():
+    """Clean up at the end of test"""
     shutil.rmtree("tmdbapi/tests/temp", ignore_errors=True)
 
 
