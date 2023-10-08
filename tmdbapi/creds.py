@@ -5,11 +5,19 @@ credentials, including access tokens, API keys, session IDs, account
 IDs, and account object IDs.
 """
 
+import base64
+import getpass
 import os
 import pickle
 from pathlib import Path
 
+from cryptography.fernet import Fernet
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+
 import tmdbapi
+
+SALT_LEN = 64
 
 
 class Credential:
@@ -27,6 +35,10 @@ class Credential:
     file_update : bool
         A flag indicating whether to automatically update the credentials
         file when credentials are modified.
+    encrypt : bool
+        Whether the file is encrypted.
+    password : str
+        The password of encrypted file.
 
     Methods
     -------
@@ -52,6 +64,12 @@ class Credential:
     pprint():
         Pretty print the credential dictionary.
 
+    save_encrypt(filepath: str = "", auto_update=True):
+        Save the encrypted credentials to a file.
+
+    load_encrypt(filepath: str, auto_update=True):
+        Load encrypted credentials from a file.
+
     """
 
     def __init__(self):
@@ -64,6 +82,8 @@ class Credential:
         }
         self.filepath = ""
         self.file_update = True
+        self.encrypt = False
+        self.password = ""
 
     def __getitem__(self, key):
         return self._cred[key]
@@ -92,9 +112,12 @@ class Credential:
             change_str = ", ".join(change)
             tmdbapi.LOGGER.info(f"Credential update: {change_str}")
         # save the changes.
-        if save:
+        if save and change:
             if self.filepath != "" and self.file_update:
-                self.save(auto_update=self.file_update)
+                if self.encrypt:
+                    self.save_encrypt(auto_update=self.file_update)
+                else:
+                    self.save(auto_update=self.file_update)
         # if access_token given then use access_token instead of api_key
         if tmdbapi.setting["credential"] is not None:
             if self._cred["access_token"] == "":
@@ -204,6 +227,8 @@ class Credential:
                     "No filepath provided. Please specify a valid file path to save the credentials."
                 )
         self.file_update = auto_update
+        self.encrypt = False
+        filepath += ".credential"
         path = Path(filepath)
         path.parent.mkdir(parents=True, exist_ok=True)
         with open(filepath, "wb") as f:
@@ -252,6 +277,7 @@ class Credential:
             )
         self.file_update = auto_update
         self.filepath = filepath
+        self.encrypt = False
 
     def cred_to_env(self):
         """Set credentials as environment variables.
@@ -366,3 +392,223 @@ class Credential:
                 if self._cred[key] == 0:
                     return False
         return True
+
+    def save_encrypt(self, filepath: str = "", auto_update=True):
+        """Save the encrypt credentials to a file.
+
+        This method allows you to save the API credentials to a file in an
+        encrypted format.
+        The credentials will be encrypted using a password provided interactively
+        through the console. You will be prompted to enter the password securely.
+
+        **Warning:** Please remember your password securely. There is no way to
+        recover it if it is forgotten.
+
+        Parameters
+        ----------
+        filepath : str, optional
+            The file path where the credentials will be saved. If not specified,
+            it will use the file path loaded or saved previously.
+        auto_update : bool, optional
+            A flag indicating whether to automatically update the credentials
+            file when credentials are modified (default is True).
+
+        Notes
+        -----
+        This method will save the credentials stored in the `Credential` instance
+        to the specified file path. If `filepath` is not provided, it will use
+        the file path that was previously loaded or saved. If the file does not
+        exist, it will be created. Any existing file at the specified location
+        will be overwritten.
+
+        """
+        path_given = filepath != ""
+        path_exist = self.filepath != ""
+        if path_given:
+            self.filepath = filepath
+        else:
+            if path_exist:
+                filepath = self.filepath
+            else:
+                raise ValueError(
+                    "No filepath provided. Please specify a valid file path to save the credentials."
+                )
+        self.file_update = auto_update
+        self.encrypt = True
+        filepath += ".enc.credential"
+        path = Path(filepath)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        if self.password == "":
+            self.password = getpass.getpass()
+        enc = Encrypt(self.password)
+        enc.encrypt_pickle(filepath, self._cred)
+        tmdbapi.LOGGER.info(f"Credential store at {path.absolute()}")
+
+    def load_encrypt(self, filepath: str, auto_update=True):
+        """Load encrypted credentials from a file.
+
+        This method allows you to load API credentials from a specified file
+        in an encrypted format. The previous credential information stored in
+        the `Credential` instance will be discarded, and the new credentials
+        from the file will be used.
+
+        Parameters
+        ----------
+        filepath : str
+            The file path where the credentials will be loaded from.
+        auto_update : bool, optional
+            A flag indicating whether to automatically update the credentials
+            file when credentials are modified (default is True).
+
+        Notes
+        -----
+        The credentials file must be in a specific format created by the `save_encrypt()`
+        method, and it cannot be customized. The file format includes fields for
+        "access_token," "api_key," "session_id," "account_id," and
+        "account_object_id." If the file format does not match, an exception
+        will be raised.
+
+        **Warning:** Ensure that you provide the correct encrypted credentials file,
+        as loading credentials from an incorrect file may lead to authentication
+        issues.
+
+        """
+        if self.password == "":
+            self.password = getpass.getpass()
+        enc = Encrypt(self.password)
+        cred = enc.decrypt_pickle(filepath)
+
+        # type checking
+        if isinstance(cred, dict) and set(cred.keys()) == {
+            "access_token",
+            "api_key",
+            "session_id",
+            "account_id",
+            "account_object_id",
+        }:
+            tmdbapi.LOGGER.info("Credentials loaded successfully.")
+            self._set(cred, False)
+        else:
+            raise Exception(
+                "The credential file format is invalid. Please ensure that the file was created using the 'save()' method and follows the required format."
+            )
+        self.file_update = auto_update
+        self.filepath = filepath
+        self.encrypt = True
+
+
+class Encrypt:
+    """A class for encrypting and decrypting pickled Python objects using PBKDF2 and Fernet.
+
+    This class provides methods for encrypting and decrypting pickled Python objects
+    with strong key derivation from a human-readable password using PBKDF2 and symmetric
+    encryption using Fernet.
+
+    """
+
+    def __init__(self, password: str, iterations=600000) -> None:
+        """Create the Encrypt object.
+
+        Parameters
+        ----------
+        password : str
+            A human-readable password used for encryption and decryption.
+        iterations : int, optional
+            Number of iterations for key derivation. By default, 600000.
+
+        """
+        self.password = password.encode()
+        self.iterations = iterations
+
+    def generate_key_from_password(self, salt: bytes) -> bytes:
+        """Function to generate a key from password and salt using PBKDF2
+
+        Parameters
+        ----------
+        password : str
+            Human readable password
+        salt : bytes
+
+        Returns
+        -------
+        bytes
+            the derived key
+        """
+        kdf = PBKDF2HMAC(
+            algorithm=hashes.SHA256(), salt=salt, iterations=self.iterations, length=32
+        )
+        return base64.urlsafe_b64encode(kdf.derive(self.password))
+
+    def verify(self, key: bytes, salt: bytes) -> bool:
+        """_summary_
+
+        Parameters
+        ----------
+        key : bytes
+            _description_
+        salt : bytes
+
+        Returns
+        -------
+        bool
+            _description_
+        """
+        kdf = PBKDF2HMAC(
+            algorithm=hashes.SHA256(), salt=salt, iterations=self.iterations, length=32
+        )
+        try:
+            kdf.verify(self.password, base64.urlsafe_b64decode(key))
+            return True
+        except:
+            return False
+
+    def encrypt_pickle(self, filepath: str, obj):
+        """Encrypt and save a pickled Python object to a file.
+
+        Parameters
+        ----------
+        filepath : str
+            The path to the file where the encrypted pickle will be saved.
+        obj : Any
+            A Python object to be pickled and encrypted.
+
+        """
+        pickled = pickle.dumps(obj)
+        salt = os.urandom(SALT_LEN)
+        key = self.generate_key_from_password(salt)
+        encrypted_pickle = Fernet(key).encrypt(pickled + key)
+
+        with open(filepath, "wb") as file:
+            file.write(salt + encrypted_pickle)
+
+    def decrypt_pickle(self, filepath: str):
+        """Decrypt and load a pickled Python object from a file.
+
+        Parameters
+        ----------
+        filepath : str
+            The path to the file containing the encrypted pickle.
+
+        Returns
+        -------
+        Any
+            A Python object that has been decrypted and loaded from the file.
+
+        """
+        with open(filepath, "rb") as file:
+            data = file.read()
+        salt, encrypted_pickle = data[:SALT_LEN], data[SALT_LEN:]
+        key = self.generate_key_from_password(salt)
+
+        try:
+            decrypted = Fernet(key).decrypt(encrypted_pickle)
+            decrypted_pickle, decrypted_key = decrypted[:-44], decrypted[-44:]
+
+            if decrypted_key == key:
+                success = True
+        except:
+            success = False
+        if success:
+            return pickle.loads(decrypted_pickle)
+        else:
+            raise Exception("Wrong password.")

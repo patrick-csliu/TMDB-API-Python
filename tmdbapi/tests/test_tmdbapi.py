@@ -6,7 +6,10 @@ import pytest
 
 import tmdbapi
 
-CREDENTIAL_PATH = "tmdbapi/tests/temp/test0.credential"
+CREDENTIAL_PATH_S = "tmdbapi/tests/temp/test0"
+CREDENTIAL_PATH_L = "tmdbapi/tests/temp/test0.credential"
+ENC_CREDENTIAL_PATH_S = "tmdbapi/tests/temp/test1"
+ENC_CREDENTIAL_PATH_L = "tmdbapi/tests/temp/test1.enc.credential"
 
 
 @pytest.fixture(autouse=True)
@@ -83,12 +86,12 @@ class TestCredentials:
     def test_save_credentials(self):
         cred = tmdbapi.Credential()
         cred.set("1", "2", "3", 4, "5")
-        cred.save(CREDENTIAL_PATH)
-        assert Path(CREDENTIAL_PATH).exists()
+        cred.save(CREDENTIAL_PATH_S)
+        assert Path(CREDENTIAL_PATH_L).exists()
 
     def test_load_credentials(self):
         cred = tmdbapi.Credential()
-        cred.load(CREDENTIAL_PATH)
+        cred.load(CREDENTIAL_PATH_L)
         assert cred == {
             "access_token": "1",
             "api_key": "2",
@@ -100,10 +103,10 @@ class TestCredentials:
     def test_load_credentials_auto_update_true(self):
         cred = tmdbapi.Credential()
         cred.set("1", "2", "3", 4, "5")
-        cred.save(CREDENTIAL_PATH, auto_update=True)
+        cred.save(CREDENTIAL_PATH_S, auto_update=True)
         cred.set("2", "3", "4", 5, "6")
         cred2 = tmdbapi.Credential()
-        cred2.load(CREDENTIAL_PATH)
+        cred2.load(CREDENTIAL_PATH_L)
         assert cred2 == {
             "access_token": "2",
             "api_key": "3",
@@ -115,10 +118,10 @@ class TestCredentials:
     def test_load_credentials_auto_update_false(self):
         cred = tmdbapi.Credential()
         cred.set("1", "2", "3", 4, "5")
-        cred.save(CREDENTIAL_PATH, auto_update=False)
+        cred.save(CREDENTIAL_PATH_S, auto_update=False)
         cred.set("2", "3", "4", 5, "6")
         cred2 = tmdbapi.Credential()
-        cred2.load(CREDENTIAL_PATH)
+        cred2.load(CREDENTIAL_PATH_L)
         assert cred2 == {
             "access_token": "1",
             "api_key": "2",
@@ -129,7 +132,7 @@ class TestCredentials:
 
     def test_set_env_var(self):
         cred = tmdbapi.Credential()
-        cred.load(CREDENTIAL_PATH)
+        cred.load(CREDENTIAL_PATH_L)
         cred.cred_to_env()
         vars = [
             "TMDB_ACCESS_TOKEN",
@@ -143,7 +146,7 @@ class TestCredentials:
 
     def test_load_env_var(self):
         cred = tmdbapi.Credential()
-        cred.load(CREDENTIAL_PATH)
+        cred.load(CREDENTIAL_PATH_L)
         cred.cred_to_env()
         cred2 = tmdbapi.Credential()
         cred2.load_env_var()
@@ -168,6 +171,23 @@ class TestCredentials:
         cred = tmdbapi.Credential()
         cred.set("1", "2", "3", 0, "5")
         assert not cred.pass_check("access_token", "account_id")
+    
+    def test_encrypt(self):
+        cred = tmdbapi.Credential()
+        cred.set("1", "2", "3", 4, "5")
+        cred.password = 'test!PaSsWoRd'
+        cred.save_encrypt(ENC_CREDENTIAL_PATH_S)
+        cred.set("q")
+        cred2 = tmdbapi.Credential()
+        cred2.password = 'test!PaSsWoRd'
+        cred2.load_encrypt(ENC_CREDENTIAL_PATH_L)
+        assert cred2 == {
+            "access_token": "q",
+            "api_key": "2",
+            "session_id": "3",
+            "account_id": 4,
+            "account_object_id": "5",
+        }
 
 
 

@@ -118,14 +118,17 @@ Contributions that introduce new features or enhance existing ones are always we
     * #### Save credentials to a file:
 
         ```python
-        cred.save("path/to/file")
+        # Choose one option:
+        cred.save("path/to/file") # For unencrypted storage
+        cred.save_encrypt("path/to/file") # For encrypted storage
         ```
 
     * #### With this file, next time you can load credentials from this file:
 
         ```python
         cred = tmdbapi.Credential() # Create a new credential object
-        cred.load("path/to/file") # Load the credential file
+        cred.load("path/to/file") # Load the credential file (unencrypted)
+        cred.load_encrypt("path/to/file") # Load the encrypted credential file
         ```
 
     * #### In some case you would like to put and get this credential information on environment variable:
