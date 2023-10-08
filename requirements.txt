@@ -1,0 +1,7 @@
+setuptools>=68.0
+build
+pytest
+Requests
+pytest-assume
+pytest-dependency
+cryptography
