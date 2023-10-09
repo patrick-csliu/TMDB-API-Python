@@ -42,7 +42,7 @@ def pytest_configure(config):
     if cred_path.is_file():
         path_text = cred_path.absolute()
     else:
-        raise FileNotFoundError(f"Not found: {path_text}")
+        raise FileNotFoundError(f"Not found: {cred_path.absolute()}")
 
     Path("tmdbapi/tests/temp").mkdir(parents=True, exist_ok=True)
     shutil.copyfile(path_text, "tmdbapi/tests/temp/test.credential")
