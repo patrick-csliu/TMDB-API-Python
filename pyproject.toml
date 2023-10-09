@@ -24,6 +24,7 @@ dependencies = [
   "Requests",
   "pytest-assume",
   "pytest-dependency",
+  "cryptography",
 ]
 classifiers = [
     "Programming Language :: Python :: 3",
