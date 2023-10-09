@@ -1,6 +1,7 @@
 # Welcome to TMDB API Library
 
-<a href="https://pypi.org/project/TMDB-Py"><img alt="PyPI - Version" src="https://img.shields.io/pypi/v/TMDB-Py"></a>
+[![PyPI - Version](https://img.shields.io/pypi/v/TMDB-Py)](https://pypi.org/project/TMDB-Py)
+![GitHub license](https://img.shields.io/github/license/patrick-csliu/TMDB-API-Python)
 
 TMDB API Python Library: A comprehensive Python library for interacting with TheMovieDB API, enabling easy access to movie and TV show data, including details, ratings, and more. Simplify your movie-related projects with this powerful Python tool.
 

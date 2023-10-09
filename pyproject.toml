@@ -8,7 +8,7 @@ packages = ["tmdbapi", "tmdbapi.api3", "tmdbapi.api4", "tmdbapi.integration",
 
 [project]
 name = "TMDB-Py"
-version = "v1.1.0"
+version = "v1.1.1"
 license = {file = "LICENSE"}
 authors = [
   {name="Patrick Liu", email="32678320+patrick-csliu@users.noreply.github.com"}
