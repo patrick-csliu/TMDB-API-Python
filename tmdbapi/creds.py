@@ -218,20 +218,18 @@ class Credential:
         path_given = filepath != ""
         path_exist = self.filepath != ""
         if path_given:
+            filepath += ".credential"
             self.filepath = filepath
         else:
-            if path_exist:
-                filepath = self.filepath
-            else:
+            if not path_exist:
                 raise ValueError(
                     "No filepath provided. Please specify a valid file path to save the credentials."
                 )
         self.file_update = auto_update
         self.encrypt = False
-        filepath += ".credential"
-        path = Path(filepath)
+        path = Path(self.filepath)
         path.parent.mkdir(parents=True, exist_ok=True)
-        with open(filepath, "wb") as f:
+        with open(self.filepath, "wb") as f:
             pickle.dump(self._cred, f)
         tmdbapi.LOGGER.info(f"Credential store at {path.absolute()}")
 
@@ -425,23 +423,21 @@ class Credential:
         path_given = filepath != ""
         path_exist = self.filepath != ""
         if path_given:
+            filepath += ".enc.credential"
             self.filepath = filepath
         else:
-            if path_exist:
-                filepath = self.filepath
-            else:
+            if not path_exist:
                 raise ValueError(
                     "No filepath provided. Please specify a valid file path to save the credentials."
                 )
         self.file_update = auto_update
         self.encrypt = True
-        filepath += ".enc.credential"
-        path = Path(filepath)
+        path = Path(self.filepath)
         path.parent.mkdir(parents=True, exist_ok=True)
         if self.password == "":
             self.password = getpass.getpass()
         enc = Encrypt(self.password)
-        enc.encrypt_pickle(filepath, self._cred)
+        enc.encrypt_pickle(self.filepath, self._cred)
         tmdbapi.LOGGER.info(f"Credential store at {path.absolute()}")
 
     def load_encrypt(self, filepath: str, auto_update=True):
