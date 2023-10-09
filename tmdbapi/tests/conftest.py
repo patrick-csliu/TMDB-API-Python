@@ -31,7 +31,10 @@ def pytest_configure(config):
     This hook is called for every plugin and initial conftest
     file after command line options have been parsed.
     """
-    path = config.getoption("--cred")
+    try:
+        path = config.getoption("--cred")
+    except:
+        path = None
     if path is None:
         cred_path = Path("test.credential")
     else:
