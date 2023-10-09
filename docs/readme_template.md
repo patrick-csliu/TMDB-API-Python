@@ -245,3 +245,9 @@ response json:
 ```
 The error is at TMDB API, please use api4 instead, or you may need to catch the exception.
 [Issue on TMDB support](https://www.themoviedb.org/talk/6302b1c7fb5299007a7676ff)
+
+## Unit Test
+
+```shell
+python run_test.py
+```
