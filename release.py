@@ -57,7 +57,7 @@ if __name__ == "__main__":
     content_p0 = INSERTS[0][1].format(version=version)
     readme_file.insert_content(INSERTS[0][0], content_p0)
     # point 1
-    content_p1 = INSERTS[1][1].format(version=version)
+    content_p1 = INSERTS[1][1].format(version=version[1:])
     readme_file.insert_content(INSERTS[1][0], content_p1)
     # save the file
     with open("README.md", "w", encoding="utf-8") as f:
