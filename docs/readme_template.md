@@ -248,6 +248,7 @@ The error is at TMDB API, please use api4 instead, or you may need to catch the 
 
 ## Unit Test
 
+Run unit test:
 ```shell
 python run_test.py
 ```

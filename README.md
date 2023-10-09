@@ -22,9 +22,9 @@ TMDB API Python Library: A comprehensive Python library for interacting with The
     pip install TMDB-Py
     ```
 
-1. Download the latest release from [Release v1.0.0](https://github.com/patrick-csliu/TMDB-API-Python/releases/tag/v1.0.0)
+1. Download the latest release from [Release v1.1.0](https://github.com/patrick-csliu/TMDB-API-Python/releases/tag/v1.1.0)
     ```shell
-    pip install TMDB-Py-v1.0.0.tar.gz
+    pip install TMDB-Py-1.1.0.tar.gz
     ```
 
 ## Getting Started
@@ -118,14 +118,17 @@ Contributions that introduce new features or enhance existing ones are always we
     * #### Save credentials to a file:
 
         ```python
-        cred.save("path/to/file")
+        # Choose one option:
+        cred.save("path/to/file") # For unencrypted storage
+        cred.save_encrypt("path/to/file") # For encrypted storage
         ```
 
     * #### With this file, next time you can load credentials from this file:
 
         ```python
         cred = tmdbapi.Credential() # Create a new credential object
-        cred.load("path/to/file") # Load the credential file
+        cred.load("path/to/file") # Load the credential file (unencrypted)
+        cred.load_encrypt("path/to/file") # Load the encrypted credential file
         ```
 
     * #### In some case you would like to put and get this credential information on environment variable:
@@ -242,3 +245,10 @@ response json:
 ```
 The error is at TMDB API, please use api4 instead, or you may need to catch the exception.
 [Issue on TMDB support](https://www.themoviedb.org/talk/6302b1c7fb5299007a7676ff)
+
+## Unit Test
+
+Run unit test:
+```shell
+python run_test.py
+```
