@@ -30,7 +30,8 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: python-package-distributions
-        path: dist/*.tar.gz # only source distribution
+        # path: dist/*.tar.gz # only source distribution
+        path: dist/*
     - name: Get the file name and path in /dist
       run: |
         VAR1=$(find ./dist -type f -name "*.tar.gz")
@@ -75,27 +76,27 @@ jobs:
         asset_path: ${{ steps.filename.outputs.TAR_PATH }}
         asset_name: ${{ steps.filename.outputs.TAR_FILE }}
         asset_content_type: application/gzip
-  build_wheels:
-    name: Build wheels on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macOS-latest]
+  # build_wheels:
+  #   name: Build wheels on ${{ matrix.os }}
+  #   runs-on: ${{ matrix.os }}
+  #   strategy:
+  #     matrix:
+  #       os: [ubuntu-latest, windows-latest, macOS-latest]
 
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v4
-        with:
-          python-version: "3.11.5"
-          check-latest: true
-      - name: Install cibuildwheel
-        run: python -m pip install cibuildwheel==2.16.2
-      - name: Build wheels
-        run: python -m cibuildwheel --output-dir wheelhouse
-      - uses: actions/upload-artifact@v3
-        with:
-          name: python-package-distributions
-          path: ./wheelhouse/*.whl
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: actions/setup-python@v4
+  #       with:
+  #         python-version: "3.11.5"
+  #         check-latest: true
+  #     - name: Install cibuildwheel
+  #       run: python -m pip install cibuildwheel==2.16.2
+  #     - name: Build wheels
+  #       run: python -m cibuildwheel --output-dir wheelhouse
+  #     - uses: actions/upload-artifact@v3
+  #       with:
+  #         name: python-package-distributions
+  #         path: ./wheelhouse/*.whl
   # publish-to-testpypi:
   #   name: Publish Python distribution 📦 to TestPyPI
   #   needs:
@@ -126,7 +127,7 @@ jobs:
       Publish Python distribution 📦 to PyPI
     needs:
     - build
-    - build_wheels
+    # - build_wheels
     runs-on: ubuntu-latest
     environment:
       name: pypi
